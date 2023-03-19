@@ -18,6 +18,7 @@ open class BaseApp(
     var nativeLibraryDir: String? = null,
     var processName: String? = null,
     var publicSourceDir: String? = null,
+    var size: Long? = null,
     var sourceDir: String? = null,
     var splitNames: Array<String>? = null,
     var splitPublicSourceDirs: Array<String>? = null,

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_bnv_home"
+        android:title="@string/home" />
+    <item
+        android:id="@+id/filesFragment"
+        android:icon="@drawable/ic_bnv_files"
+        android:title="@string/files" />
+    <item
+        android:id="@+id/securityFragment"
+        android:icon="@drawable/ic_bnv_security"
+        android:title="@string/security" />
+    <item
+        android:id="@+id/cleanFragment"
+        android:icon="@drawable/ic_bnv_clean"
+        android:title="@string/clean" />
+</menu>

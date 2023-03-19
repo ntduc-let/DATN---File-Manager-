@@ -2,11 +2,16 @@ package com.ntduc.baseproject.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.usage.StorageStats
+import android.app.usage.StorageStatsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.os.Build
+import android.os.storage.StorageManager
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import com.ntduc.baseproject.data.dto.base.BaseApp
 import java.io.File
@@ -50,6 +55,22 @@ fun Context.getApps(
             newInfo.processName = pack.processName
             newInfo.nativeLibraryDir = pack.nativeLibraryDir
             newInfo.publicSourceDir = pack.publicSourceDir
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val storageStatsManager: StorageStatsManager = this.getSystemService(Context.STORAGE_STATS_SERVICE) as StorageStatsManager
+                try {
+                    val storageStats: StorageStats = storageStatsManager.queryStatsForUid(pack.storageUuid, pack.uid)
+                    val cacheSize = storageStats.cacheBytes
+                    val dataSize = storageStats.dataBytes
+                    val apkSize = storageStats.appBytes
+                    newInfo.size = cacheSize + dataSize + apkSize
+                } catch (_: Exception) {
+                }
+            } else {
+                newInfo.size = null
+            }
+
+
             newInfo.sourceDir = pack.sourceDir
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 newInfo.splitNames = pack.splitNames

@@ -6,4 +6,24 @@
     <string name="invalid_password">Password must be >4 characters</string>
     <string name="invalid_username_and_password">please check your username and password</string>
     <string name="search_error">there is no such recipe name</string>
+    <string name="clean">Clean</string>
+    <string name="security">Security</string>
+    <string name="files">Files</string>
+    <string name="home">Home</string>
+    <string name="internal_storage">Internal Storage</string>
+    <string name="view_details">View Details</string>
+    <string name="see_all">See all</string>
+    <string name="recent_files">Recent Files</string>
+    <string name="content_request_permission_read_all_file">Allow access to your all files can help you quickly find your photos, videos, documents and more</string>
+    <string name="allow">Allow</string>
+    <string name="deny">Deny</string>
+    <string name="used">Used</string>
+    <string name="available">Available</string>
+    <string name="total">Total</string>
+    <string name="apps">Apps</string>
+    <string name="videos">Videos</string>
+    <string name="document">Document</string>
+    <string name="images">Images</string>
+    <string name="audio">Audio</string>
+    <string name="content_request_permission_access_setting">File Manager needs access to calculate app storage</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.ntduc.baseproject.data
 
+import com.ntduc.baseproject.data.dto.base.*
 import com.ntduc.baseproject.data.dto.files.Files
 import com.ntduc.baseproject.data.dto.frames.DataFrames
 import com.ntduc.baseproject.data.dto.login.LoginRequest
@@ -19,4 +20,11 @@ interface DataRepositorySource {
     suspend fun isFavourite(id: String): Flow<Resource<Boolean>>
     suspend fun requestFrames(): Flow<Resource<DataFrames>>
     suspend fun requestAllFiles(types: List<String>): Flow<Resource<Files>>
+
+    suspend fun requestAllApk(): Flow<Resource<List<BaseFile>>>
+    suspend fun requestAllApp(isSystem: Boolean): Flow<Resource<List<BaseApp>>>
+    suspend fun requestAllVideos(): Flow<Resource<List<BaseVideo>>>
+    suspend fun requestAllDocument(): Flow<Resource<List<BaseFile>>>
+    suspend fun requestAllImages(): Flow<Resource<List<BaseImage>>>
+    suspend fun requestAllAudio(): Flow<Resource<List<BaseAudio>>>
 }

@@ -82,7 +82,6 @@ fun AppCompatActivity.setupNavigationWithNavigationBar(
   topLevelDestinationIds: Set<Int>,
 ): AppBarConfiguration {
   val appBarConfiguration = AppBarConfiguration(topLevelDestinationIds)
-  setupActionBarWithNavController(navController, appBarConfiguration)
   bottomNavigationView.setupWithNavController(navController)
   return appBarConfiguration
 }
@@ -94,7 +93,6 @@ fun AppCompatActivity.setupNavigationWithNavigationBar(
 ): AppBarConfiguration {
   val appBarConfiguration = AppBarConfiguration(topLevelDestinationIds)
   val navController = findNavController(idNavHostFragment)
-  setupActionBarWithNavController(navController, appBarConfiguration)
   bottomNavigationView.setupWithNavController(navController)
   return appBarConfiguration
 }

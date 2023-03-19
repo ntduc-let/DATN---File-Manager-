@@ -1,5 +1,6 @@
 package com.ntduc.baseproject.data
 
+import com.ntduc.baseproject.data.dto.base.*
 import com.ntduc.baseproject.data.dto.files.Files
 import com.ntduc.baseproject.data.remote.RemoteData
 import com.ntduc.baseproject.data.dto.frames.DataFrames
@@ -73,6 +74,42 @@ class DataRepository @Inject constructor(private val remoteRepository: RemoteDat
     override suspend fun requestAllFiles(types: List<String>): Flow<Resource<Files>> {
         return flow<Resource<Files>> {
             emit(localRepository.requestAllFiles(types))
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun requestAllApk(): Flow<Resource<List<BaseFile>>> {
+        return flow {
+            emit(localRepository.requestAllApk())
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun requestAllApp(isSystem: Boolean): Flow<Resource<List<BaseApp>>> {
+        return flow {
+            emit(localRepository.requestAllApp(isSystem))
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun requestAllVideos(): Flow<Resource<List<BaseVideo>>> {
+        return flow {
+            emit(localRepository.requestAllVideos())
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun requestAllDocument(): Flow<Resource<List<BaseFile>>> {
+        return flow {
+            emit(localRepository.requestAllDocument())
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun requestAllImages(): Flow<Resource<List<BaseImage>>> {
+        return flow {
+            emit(localRepository.requestAllImages())
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun requestAllAudio(): Flow<Resource<List<BaseAudio>>> {
+        return flow {
+            emit(localRepository.requestAllAudio())
         }.flowOn(ioDispatcher)
     }
 }

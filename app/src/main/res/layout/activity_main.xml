@@ -1,53 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".file_utils.activity.FileUtilsActivity">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <fragment
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:defaultNavHost="true"
+            app:layout_constraintBottom_toTopOf="@id/bnv"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navGraph="@navigation/main_navigation" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bnv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/getAllFile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Get All File"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/getAllDocument"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Get All Document"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/getAllAudio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Get All Audio"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/getAllImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Get All Image"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/getAllVideo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Get All Video"
-                android:textAllCaps="false" />
-
-        </LinearLayout>
-    </ScrollView>
+            android:theme="@style/BottomNavigationTheme"
+            app:backgroundTint="@color/white"
+            app:itemRippleColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:menu="@menu/bottom_nav_main_menu" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

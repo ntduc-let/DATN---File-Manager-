@@ -27,7 +27,6 @@ object FileTypeExtension {
             FileType.DOCUMENT_DOC.contains(extension) -> DOC
             FileType.DOCUMENT_XLS.contains(extension) -> XLS
             FileType.DOCUMENT_PPT.contains(extension) -> PPT
-            FileType.COMPRESSED.contains(extension) -> COMPRESSED
             FileType.APK.contains(extension) -> APK
             else -> OTHER
         }
@@ -35,21 +34,16 @@ object FileTypeExtension {
 
     fun getIconFile(path: String): Int {
         val file = File(path)
-        if (file.isDirectory) return R.drawable.ic_folder
+        if (file.isDirectory) return R.drawable.ic_folder_24dp
 
         val extension = file.extension
         return when {
-            FileType.IMAGE.contains(extension) -> R.drawable.ic_image
-            FileType.VIDEO.contains(extension) -> R.drawable.ic_video
-            FileType.AUDIO.contains(extension) -> R.drawable.ic_music
-            FileType.DOCUMENT_PDF.contains(extension) -> R.drawable.ic_pdf
-            FileType.DOCUMENT_TXT.contains(extension) -> R.drawable.ic_txt
-            FileType.DOCUMENT_DOC.contains(extension) -> R.drawable.ic_doc
-            FileType.DOCUMENT_XLS.contains(extension) -> R.drawable.ic_xls
-            FileType.DOCUMENT_PPT.contains(extension) -> R.drawable.ic_ppt
-            FileType.COMPRESSED.contains(extension) -> R.drawable.zip
-            FileType.APK.contains(extension) -> R.drawable.ic_apk
-            else -> R.drawable.ic_file
+            FileType.IMAGE.contains(extension) -> R.drawable.ic_image_32dp
+            FileType.VIDEO.contains(extension) -> R.drawable.ic_video_32dp
+            FileType.AUDIO.contains(extension) -> R.drawable.ic_music_32dp
+            FileType.DOCUMENT.contains(extension) -> R.drawable.ic_document_32dp
+            FileType.APK.contains(extension) -> R.drawable.ic_app_32dp
+            else -> R.drawable.ic_file_24dp
         }
     }
 }

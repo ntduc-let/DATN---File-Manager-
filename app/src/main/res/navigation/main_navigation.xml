@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_navigation.xml"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.HomeFragment"
+        android:label="HomeFragment" />
+    <fragment
+        android:id="@+id/filesFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.FilesFragment"
+        android:label="FilesFragment" />
+    <fragment
+        android:id="@+id/securityFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.SecurityFragment"
+        android:label="SecurityFragment" />
+    <fragment
+        android:id="@+id/cleanFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.CleanFragment"
+        android:label="CleanFragment" />
+    <fragment
+        android:id="@+id/detailInternalStorageFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.DetailInternalStorageFragment"
+        android:label="DetailInternalStorageFragment" />
+</navigation>
