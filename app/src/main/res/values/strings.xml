@@ -26,4 +26,6 @@
     <string name="images">Images</string>
     <string name="audio">Audio</string>
     <string name="content_request_permission_access_setting">File Manager needs access to calculate app storage</string>
+    <string name="apks">Apks</string>
+    <string name="there_s_nothing_here">There\'s nothing here.</string>
 </resources>

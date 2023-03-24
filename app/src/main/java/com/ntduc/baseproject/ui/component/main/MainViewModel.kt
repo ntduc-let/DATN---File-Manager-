@@ -4,13 +4,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.ntduc.baseproject.constant.FileType
 import com.ntduc.baseproject.data.DataRepositorySource
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.*
-import com.ntduc.baseproject.data.dto.files.Files
 import com.ntduc.baseproject.ui.base.BaseViewModel
-import com.ntduc.baseproject.ui.component.detail.DetailActivity
 import com.ntduc.baseproject.utils.wrapEspressoIdlingResource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -25,11 +22,11 @@ class MainViewModel @Inject constructor(
     val apkListLiveDataPrivate = MutableLiveData<Resource<List<BaseFile>>>()
     val apkListLiveData: LiveData<Resource<List<BaseFile>>> get() = apkListLiveDataPrivate
 
-    fun requestAllApk(){
+    fun requestAllApk() {
         viewModelScope.launch {
             apkListLiveDataPrivate.value = Resource.Loading()
             wrapEspressoIdlingResource {
-                repository.requestAllApk().collect{
+                repository.requestAllApk().collect {
                     apkListLiveDataPrivate.value = it
                 }
             }
@@ -44,16 +41,16 @@ class MainViewModel @Inject constructor(
     val appListLiveDataPrivate = MutableLiveData<Resource<List<BaseApp>>>()
     val appListLiveData: LiveData<Resource<List<BaseApp>>> get() = appListLiveDataPrivate
 
-    fun requestAllApp(){
+    fun requestAllApp() {
         viewModelScope.launch {
             appWithoutSystemListLiveDataPrivate.value = Resource.Loading()
             appListLiveDataPrivate.value = Resource.Loading()
 
             wrapEspressoIdlingResource {
-                repository.requestAllApp(false).collect{
+                repository.requestAllApp(false).collect {
                     appWithoutSystemListLiveDataPrivate.value = it
                 }
-                repository.requestAllApp(true).collect{
+                repository.requestAllApp(true).collect {
                     appListLiveDataPrivate.value = it
                 }
             }
@@ -64,11 +61,11 @@ class MainViewModel @Inject constructor(
     val videoListLiveDataPrivate = MutableLiveData<Resource<List<BaseVideo>>>()
     val videoListLiveData: LiveData<Resource<List<BaseVideo>>> get() = videoListLiveDataPrivate
 
-    fun requestAllVideos(){
+    fun requestAllVideos() {
         viewModelScope.launch {
             videoListLiveDataPrivate.value = Resource.Loading()
             wrapEspressoIdlingResource {
-                repository.requestAllVideos().collect{
+                repository.requestAllVideos().collect {
                     videoListLiveDataPrivate.value = it
                 }
             }
@@ -79,11 +76,11 @@ class MainViewModel @Inject constructor(
     val documentListLiveDataPrivate = MutableLiveData<Resource<List<BaseFile>>>()
     val documentListLiveData: LiveData<Resource<List<BaseFile>>> get() = documentListLiveDataPrivate
 
-    fun requestAllDocument(){
+    fun requestAllDocument() {
         viewModelScope.launch {
             documentListLiveDataPrivate.value = Resource.Loading()
             wrapEspressoIdlingResource {
-                repository.requestAllDocument().collect{
+                repository.requestAllDocument().collect {
                     documentListLiveDataPrivate.value = it
                 }
             }
@@ -94,11 +91,11 @@ class MainViewModel @Inject constructor(
     val imageListLiveDataPrivate = MutableLiveData<Resource<List<BaseImage>>>()
     val imageListLiveData: LiveData<Resource<List<BaseImage>>> get() = imageListLiveDataPrivate
 
-    fun requestAllImages(){
+    fun requestAllImages() {
         viewModelScope.launch {
             imageListLiveDataPrivate.value = Resource.Loading()
             wrapEspressoIdlingResource {
-                repository.requestAllImages().collect{
+                repository.requestAllImages().collect {
                     imageListLiveDataPrivate.value = it
                 }
             }
@@ -109,11 +106,11 @@ class MainViewModel @Inject constructor(
     val audioListLiveDataPrivate = MutableLiveData<Resource<List<BaseAudio>>>()
     val audioListLiveData: LiveData<Resource<List<BaseAudio>>> get() = audioListLiveDataPrivate
 
-    fun requestAllAudio(){
+    fun requestAllAudio() {
         viewModelScope.launch {
             audioListLiveDataPrivate.value = Resource.Loading()
             wrapEspressoIdlingResource {
-                repository.requestAllAudio().collect{
+                repository.requestAllAudio().collect {
                     audioListLiveDataPrivate.value = it
                 }
             }

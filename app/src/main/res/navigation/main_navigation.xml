@@ -24,4 +24,8 @@
         android:id="@+id/detailInternalStorageFragment"
         android:name="com.ntduc.baseproject.ui.component.main.fragment.home.DetailInternalStorageFragment"
         android:label="DetailInternalStorageFragment" />
+    <fragment
+        android:id="@+id/appFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.app.AppFragment"
+        android:label="AppFragment" />
 </navigation>

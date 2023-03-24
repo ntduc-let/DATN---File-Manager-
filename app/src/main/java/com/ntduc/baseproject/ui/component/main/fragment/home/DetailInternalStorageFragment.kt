@@ -12,6 +12,7 @@ import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.utils.DeviceUtils
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.formatBytes
+import com.ntduc.baseproject.utils.navigateToDes
 import com.ntduc.baseproject.utils.observe
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
@@ -53,6 +54,10 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
 
         binding.back.setOnClickShrinkEffectListener {
             findNavController().popBackStack()
+        }
+
+        binding.apps.root.setOnClickShrinkEffectListener{
+            navigateToDes(R.id.appFragment)
         }
     }
 
