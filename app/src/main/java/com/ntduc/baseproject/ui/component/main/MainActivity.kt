@@ -1,6 +1,8 @@
 package com.ntduc.baseproject.ui.component.main
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.navigation.NavController
@@ -12,6 +14,9 @@ import androidx.navigation.ui.onNavDestinationSelected
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.databinding.ActivityMainBinding
 import com.ntduc.baseproject.ui.base.BaseActivity
+import com.ntduc.baseproject.utils.REQUEST_CODE_INSTALL_APP
+import com.ntduc.baseproject.utils.REQUEST_CODE_SETTING_APP
+import com.ntduc.baseproject.utils.REQUEST_CODE_UNINSTALL_APP
 import com.ntduc.baseproject.utils.setupNavigationWithNavigationBar
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
@@ -50,5 +55,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_UNINSTALL_APP || requestCode == REQUEST_CODE_SETTING_APP || requestCode == REQUEST_CODE_INSTALL_APP) {
+            viewModel.requestAllApp()
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.app
 
-import androidx.core.content.ContextCompat
+import android.view.Gravity
+import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,11 +10,14 @@ import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseApp
 import com.ntduc.baseproject.databinding.FragmentListAppBinding
+import com.ntduc.baseproject.databinding.MenuAppDetailBinding
 import com.ntduc.baseproject.ui.adapter.AppAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
-import com.ntduc.baseproject.utils.observe
-import com.ntduc.baseproject.utils.openApp
+import com.ntduc.baseproject.ui.component.main.dialog.BasePopupWindow
+import com.ntduc.baseproject.utils.*
+import com.ntduc.baseproject.utils.activity.getStatusBarHeight
+import com.ntduc.baseproject.utils.context.displayHeight
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
@@ -44,9 +48,82 @@ class ListAppFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
             requireActivity().openApp(it.packageName!!)
         }
 
-        appAdapter.setOnMoreListener {
-
+        appAdapter.setOnMoreListener { view, baseApp ->
+            showMenu(view, baseApp)
         }
+    }
+
+    private fun showMenu(view: View, baseApp: BaseApp) {
+        val popupBinding = MenuAppDetailBinding.inflate(layoutInflater)
+        val popupWindow = BasePopupWindow(popupBinding.root)
+        popupWindow.isTouchable = true
+        popupWindow.isFocusable = true
+        popupWindow.isOutsideTouchable = true
+        popupWindow.elevation = 10f
+
+        var isFavorite = false
+        popupBinding.txtFavorite.text = getString(R.string.add_to_favorites)
+
+        run breaking@{
+            Hawk.get(FAVORITE_APP, arrayListOf<String>()).forEach {
+                if (it == baseApp.packageName) {
+                    isFavorite = true
+                    popupBinding.txtFavorite.text = getString(R.string.remove_from_favorites)
+                    return@breaking
+                }
+            }
+        }
+
+        popupBinding.uninstall.setOnClickListener {
+            requireActivity().uninstallApp(baseApp.packageName!!)
+            popupWindow.dismiss()
+        }
+
+        popupBinding.favorite.setOnClickListener {
+            if (isFavorite) {
+                removeFavorite(baseApp)
+                appAdapter.updateItem(baseApp)
+            } else {
+                addFavorite(baseApp)
+                appAdapter.updateItem(baseApp)
+            }
+            popupWindow.dismiss()
+        }
+
+        popupBinding.info.setOnClickListener {
+            requireActivity().openSettingApp(baseApp.packageName!!)
+            popupWindow.dismiss()
+        }
+
+        popupWindow.showAtLocation(view, Gravity.TOP or Gravity.END, 8.dp, view.y.toInt() + (requireActivity().displayHeight - binding.root.height) + requireActivity().getStatusBarHeight)
+    }
+
+    private fun addFavorite(baseApp: BaseApp) {
+        val favorites = Hawk.get(FAVORITE_APP, arrayListOf<String>())
+
+        val newFavorites = arrayListOf<String>()
+        newFavorites.addAll(favorites)
+
+        favorites.forEach {
+            if (it == baseApp.packageName) newFavorites.remove(it)
+        }
+
+        newFavorites.add(baseApp.packageName!!)
+
+        Hawk.put(FAVORITE_APP, newFavorites)
+    }
+
+    private fun removeFavorite(baseApp: BaseApp) {
+        val favorites = Hawk.get(FAVORITE_APP, arrayListOf<String>())
+
+        val newFavorites = arrayListOf<String>()
+        newFavorites.addAll(favorites)
+
+        favorites.forEach {
+            if (it == baseApp.packageName) newFavorites.remove(it)
+        }
+
+        Hawk.put(FAVORITE_APP, newFavorites)
     }
 
     override fun initData() {
@@ -115,4 +192,6 @@ class ListAppFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
             }
         }
     }
+
+
 }

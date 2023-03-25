@@ -4,14 +4,21 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.baseproject.R
+import com.ntduc.baseproject.constant.FAVORITE_APK
+import com.ntduc.baseproject.constant.FAVORITE_APP
 import com.ntduc.baseproject.data.dto.base.BaseApk
+import com.ntduc.baseproject.data.dto.base.BaseApp
 import com.ntduc.baseproject.databinding.ItemDocumentBinding
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
+import com.ntduc.baseproject.utils.view.gone
+import com.ntduc.baseproject.utils.view.visible
+import com.orhanobut.hawk.Hawk
 import com.skydoves.bindables.BindingListAdapter
 import com.skydoves.bindables.binding
 import java.util.*
@@ -33,6 +40,16 @@ class ApkAdapter(
 
         fun bind(baseApk: BaseApk) {
 
+            binding.favorite.gone()
+            run breaking@{
+                Hawk.get(FAVORITE_APK, arrayListOf<String>()).forEach {
+                    if (it == baseApk.data) {
+                        binding.favorite.visible()
+                        return@breaking
+                    }
+                }
+            }
+
             if (baseApk.icon != null) {
                 binding.ic.setImageDrawable(baseApk.icon)
             } else {
@@ -50,12 +67,41 @@ class ApkAdapter(
 
             binding.more.setOnClickShrinkEffectListener {
                 onMoreListener?.let {
-                    it(baseApk)
+                    it(binding.root, baseApk)
                 }
             }
 
             binding.executePendingBindings()
         }
+    }
+
+    fun updateItem(baseApk: BaseApk) {
+        var position = -1
+        run breaking@{
+            currentList.indices.forEach {
+                if (currentList[it].data == baseApk.data) {
+                    position = it
+                    return@breaking
+                }
+            }
+        }
+
+        if (position != -1) notifyItemChanged(position)
+    }
+
+    fun removeItem(baseApk: BaseApk) {
+        var position = -1
+        run breaking@{
+            currentList.indices.forEach {
+                if (currentList[it].data == baseApk.data) {
+                    currentList.removeAt(it)
+                    position = it
+                    return@breaking
+                }
+            }
+        }
+
+        if (position != -1) notifyItemRemoved(position)
     }
 
     companion object {
@@ -69,9 +115,9 @@ class ApkAdapter(
         }
     }
 
-    private var onMoreListener: ((BaseApk) -> Unit)? = null
+    private var onMoreListener: ((View, BaseApk) -> Unit)? = null
 
-    fun setOnMoreListener(listener: (BaseApk) -> Unit) {
+    fun setOnMoreListener(listener: (View, BaseApk) -> Unit) {
         onMoreListener = listener
     }
 

@@ -2,15 +2,21 @@ package com.ntduc.baseproject.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.baseproject.R
+import com.ntduc.baseproject.constant.FAVORITE_APP
+import com.ntduc.baseproject.constant.SORT_BY
 import com.ntduc.baseproject.data.dto.base.BaseApp
 import com.ntduc.baseproject.databinding.ItemDocumentBinding
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.formatBytes
 import com.ntduc.baseproject.utils.getDateTimeFromMillis
+import com.ntduc.baseproject.utils.view.gone
+import com.ntduc.baseproject.utils.view.visible
+import com.orhanobut.hawk.Hawk
 import com.skydoves.bindables.BindingListAdapter
 import com.skydoves.bindables.binding
 import java.util.*
@@ -31,6 +37,16 @@ class AppAdapter(
 
         fun bind(baseApp: BaseApp) {
 
+            binding.favorite.gone()
+            run breaking@{
+                Hawk.get(FAVORITE_APP, arrayListOf<String>()).forEach {
+                    if (it == baseApp.packageName) {
+                        binding.favorite.visible()
+                        return@breaking
+                    }
+                }
+            }
+
             binding.ic.setImageDrawable(baseApp.icon)
             binding.title.text = baseApp.name
             binding.description.text = "${baseApp.size?.formatBytes()} ∙ ${getDateTimeFromMillis(millis = baseApp.firstInstallTime ?: 0, dateFormat = "MMM dd yyyy", locale = Locale.ENGLISH)}"
@@ -43,12 +59,26 @@ class AppAdapter(
 
             binding.more.setOnClickShrinkEffectListener {
                 onMoreListener?.let {
-                    it(baseApp)
+                    it(binding.root, baseApp)
                 }
             }
 
             binding.executePendingBindings()
         }
+    }
+
+    fun updateItem(baseApp: BaseApp) {
+        var position = -1
+        run breaking@{
+            currentList.indices.forEach {
+                if (currentList[it].packageName == baseApp.packageName) {
+                    position = it
+                    return@breaking
+                }
+            }
+        }
+
+        if (position != -1) notifyItemChanged(position)
     }
 
     companion object {
@@ -62,9 +92,9 @@ class AppAdapter(
         }
     }
 
-    private var onMoreListener: ((BaseApp) -> Unit)? = null
+    private var onMoreListener: ((View, BaseApp) -> Unit)? = null
 
-    fun setOnMoreListener(listener: (BaseApp) -> Unit) {
+    fun setOnMoreListener(listener: (View, BaseApp) -> Unit) {
         onMoreListener = listener
     }
 

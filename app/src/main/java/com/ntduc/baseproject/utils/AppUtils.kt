@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.BaseColumns
 import android.provider.MediaStore
+import android.provider.Settings
 import androidx.core.content.FileProvider
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FileType
@@ -136,6 +137,13 @@ fun Activity.openApp(packageName: String) {
     startActivityForResult(intent, REQUEST_CODE_OPEN_APP)
 }
 
+fun Activity.openSettingApp(packageName: String) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    intent.data = Uri.fromParts("package", packageName, null)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    startActivityForResult(intent, REQUEST_CODE_OPEN_APP)
+}
+
 /*
 * <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
  */
@@ -155,13 +163,11 @@ fun Activity.installApk(path: String, authority: String) {
         val uri = FileProvider.getUriForFile(this, authority, File(path))
         val intent = Intent(Intent.ACTION_VIEW)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.setDataAndType(uri, "application/vnd.android.package-archive")
         startActivityForResult(intent, REQUEST_CODE_INSTALL_APP)
     } else {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(Uri.fromFile(File(path)), "application/vnd.android.package-archive")
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivityForResult(intent, REQUEST_CODE_INSTALL_APP)
     }
 }
@@ -171,5 +177,6 @@ private fun isSystemApplication(appInfo: ApplicationInfo): Boolean {
 }
 
 const val REQUEST_CODE_OPEN_APP = 100
-const val REQUEST_CODE_INSTALL_APP = 200
-const val REQUEST_CODE_UNINSTALL_APP = 300
+const val REQUEST_CODE_SETTING_APP = 200
+const val REQUEST_CODE_INSTALL_APP = 300
+const val REQUEST_CODE_UNINSTALL_APP = 400

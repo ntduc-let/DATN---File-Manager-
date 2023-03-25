@@ -28,4 +28,8 @@
         android:id="@+id/appFragment"
         android:name="com.ntduc.baseproject.ui.component.main.fragment.home.app.AppFragment"
         android:label="AppFragment" />
+    <fragment
+        android:id="@+id/apkDetailFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.app.ApkDetailFragment"
+        android:label="ApkDetailFragment" />
 </navigation>

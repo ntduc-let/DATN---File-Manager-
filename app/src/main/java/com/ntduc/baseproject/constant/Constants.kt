@@ -15,3 +15,8 @@ const val SORT_BY_DATE_NEW = 3
 const val SORT_BY_DATE_OLD = 4
 const val SORT_BY_SIZE_LARGE = 5
 const val SORT_BY_SIZE_SMALL = 6
+
+const val FAVORITE_APP = "FAVORITE_APP"
+const val FAVORITE_APK = "FAVORITE_APK"
+
+const val KEY_BASE_APK = "KEY_BASE_APK"
