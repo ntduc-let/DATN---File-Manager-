@@ -15,6 +15,7 @@ import com.ntduc.baseproject.utils.file.getAudios
 import com.ntduc.baseproject.utils.file.getFiles
 import com.ntduc.baseproject.utils.file.getImages
 import com.ntduc.baseproject.utils.file.getVideos
+import com.ntduc.baseproject.utils.getApks
 import com.ntduc.baseproject.utils.getApps
 import javax.inject.Inject
 
@@ -78,8 +79,8 @@ class LocalData @Inject constructor(val context: Context) {
         return Resource.Success(Files(baseFiles))
     }
 
-    fun requestAllApk(): Resource<List<BaseFile>> {
-        val baseApkList = context.getFiles(types = listOf(*FileType.APK))
+    fun requestAllApk(): Resource<List<BaseApk>> {
+        val baseApkList = context.getApks()
         return Resource.Success(baseApkList)
     }
 

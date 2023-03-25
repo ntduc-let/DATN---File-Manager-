@@ -19,8 +19,8 @@ class MainViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val apkListLiveDataPrivate = MutableLiveData<Resource<List<BaseFile>>>()
-    val apkListLiveData: LiveData<Resource<List<BaseFile>>> get() = apkListLiveDataPrivate
+    val apkListLiveDataPrivate = MutableLiveData<Resource<List<BaseApk>>>()
+    val apkListLiveData: LiveData<Resource<List<BaseApk>>> get() = apkListLiveDataPrivate
 
     fun requestAllApk() {
         viewModelScope.launch {

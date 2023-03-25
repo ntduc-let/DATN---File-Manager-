@@ -7,13 +7,18 @@ import android.app.usage.StorageStatsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.os.storage.StorageManager
-import android.util.Log
-import androidx.annotation.RequiresApi
+import android.provider.BaseColumns
+import android.provider.MediaStore
 import androidx.core.content.FileProvider
+import com.ntduc.baseproject.R
+import com.ntduc.baseproject.constant.FileType
+import com.ntduc.baseproject.data.dto.base.BaseApk
 import com.ntduc.baseproject.data.dto.base.BaseApp
+import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.utils.file.getFiles
 import java.io.File
 
 /*
@@ -26,40 +31,40 @@ fun Context.getApps(
     isSystem: Boolean = false
 ): List<BaseApp> {
     val apps = ArrayList<BaseApp>()
-    val packs = this.packageManager.getInstalledApplications(0)
+    val applicationInfos = this.packageManager.getInstalledApplications(0)
 
-    for (pack in packs) {
-        if (isSystem || !isSystemApplication(pack)) {
+    for (applicationInfo in applicationInfos) {
+        if (isSystem || !isSystemApplication(applicationInfo)) {
             val newInfo = BaseApp()
             try {
-                newInfo.name = pack.loadLabel(this.packageManager).toString()
+                newInfo.name = applicationInfo.loadLabel(this.packageManager).toString()
             } catch (_: Exception) {
             }
-            newInfo.packageName = pack.packageName
+            newInfo.packageName = applicationInfo.packageName
             try {
-                newInfo.icon = pack.loadIcon(this.packageManager)
+                newInfo.icon = applicationInfo.loadIcon(this.packageManager)
             } catch (_: Exception) {
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 try {
                     newInfo.category =
-                        ApplicationInfo.getCategoryTitle(this, pack.category).toString()
+                        ApplicationInfo.getCategoryTitle(this, applicationInfo.category).toString()
                 } catch (_: Exception) {
                 }
             }
-            newInfo.dataDir = pack.dataDir
+            newInfo.dataDir = applicationInfo.dataDir
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                newInfo.minSdkVersion = pack.minSdkVersion
+                newInfo.minSdkVersion = applicationInfo.minSdkVersion
             }
-            newInfo.targetSdkVersion = pack.targetSdkVersion
-            newInfo.processName = pack.processName
-            newInfo.nativeLibraryDir = pack.nativeLibraryDir
-            newInfo.publicSourceDir = pack.publicSourceDir
+            newInfo.targetSdkVersion = applicationInfo.targetSdkVersion
+            newInfo.processName = applicationInfo.processName
+            newInfo.nativeLibraryDir = applicationInfo.nativeLibraryDir
+            newInfo.publicSourceDir = applicationInfo.publicSourceDir
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val storageStatsManager: StorageStatsManager = this.getSystemService(Context.STORAGE_STATS_SERVICE) as StorageStatsManager
                 try {
-                    val storageStats: StorageStats = storageStatsManager.queryStatsForUid(pack.storageUuid, pack.uid)
+                    val storageStats: StorageStats = storageStatsManager.queryStatsForUid(applicationInfo.storageUuid, applicationInfo.uid)
                     val cacheSize = storageStats.cacheBytes
                     val dataSize = storageStats.dataBytes
                     val apkSize = storageStats.appBytes
@@ -70,22 +75,55 @@ fun Context.getApps(
                 newInfo.size = null
             }
 
+            val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                this.packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.PackageInfoFlags.of(0))
+            } else {
+                this.packageManager.getPackageInfo(applicationInfo.packageName, 0)
+            }
+            newInfo.firstInstallTime = pi.firstInstallTime
+            newInfo.lastUpdateTime = pi.lastUpdateTime
 
-            newInfo.sourceDir = pack.sourceDir
+            newInfo.sourceDir = applicationInfo.sourceDir
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                newInfo.splitNames = pack.splitNames
+                newInfo.splitNames = applicationInfo.splitNames
             }
-            newInfo.splitPublicSourceDirs = pack.splitPublicSourceDirs
-            newInfo.splitSourceDirs = pack.splitSourceDirs
+            newInfo.splitPublicSourceDirs = applicationInfo.splitPublicSourceDirs
+            newInfo.splitSourceDirs = applicationInfo.splitSourceDirs
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                newInfo.storageUuid = pack.storageUuid
+                newInfo.storageUuid = applicationInfo.storageUuid
             }
-            newInfo.taskAffinity = pack.taskAffinity
-            newInfo.uid = pack.uid
+            newInfo.taskAffinity = applicationInfo.taskAffinity
+            newInfo.uid = applicationInfo.uid
             apps.add(newInfo)
         }
     }
     return apps
+}
+
+fun Context.getApks(
+    directoryPath: String = ""
+): List<BaseApk> {
+    val files = ArrayList<BaseApk>()
+
+    val list = getFiles(directoryPath, listOf(*FileType.APK))
+    list.forEach {
+        val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            this.packageManager.getPackageArchiveInfo(it.data!!, PackageManager.PackageInfoFlags.of(0))
+        } else {
+            this.packageManager.getPackageArchiveInfo(it.data!!, 0)
+        }
+        val icon = if (pi != null) {
+            pi.applicationInfo.sourceDir = it.data!!
+            pi.applicationInfo.publicSourceDir = it.data!!
+
+            pi.applicationInfo.loadIcon(this.packageManager)
+        } else {
+            null
+        }
+
+        files.add(BaseApk(it.id, it.title, it.displayName, it.mimeType, it.size, it.dateAdded, it.dateModified, it.data, icon))
+    }
+    return files
 }
 
 fun Activity.openApp(packageName: String) {

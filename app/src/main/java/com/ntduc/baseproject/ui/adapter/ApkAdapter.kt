@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.data.dto.base.BaseApk
 import com.ntduc.baseproject.databinding.ItemDocumentBinding
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
@@ -19,7 +19,7 @@ import java.util.*
 
 class ApkAdapter(
     val context: Context
-) : BindingListAdapter<BaseFile, ApkAdapter.ItemViewHolder>(diffUtil) {
+) : BindingListAdapter<BaseApk, ApkAdapter.ItemViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder =
         parent.binding<ItemDocumentBinding>(R.layout.item_document).let(::ItemViewHolder)
@@ -31,34 +31,26 @@ class ApkAdapter(
         private val binding: ItemDocumentBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(baseFile: BaseFile) {
-            val pm: PackageManager = context.packageManager
-            val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                pm.getPackageArchiveInfo(baseFile.data!!, PackageManager.PackageInfoFlags.of(0))
-            } else {
-                pm.getPackageArchiveInfo(baseFile.data!!, 0)
-            }
-            if (pi != null) {
-                pi.applicationInfo.sourceDir = baseFile.data
-                pi.applicationInfo.publicSourceDir = baseFile.data
+        fun bind(baseApk: BaseApk) {
 
-                binding.ic.setImageDrawable(pi.applicationInfo.loadIcon(pm))
+            if (baseApk.icon != null) {
+                binding.ic.setImageDrawable(baseApk.icon)
             } else {
                 binding.ic.setImageResource(R.drawable.ic_launcher_foreground)
             }
 
-            binding.title.text = baseFile.title
-            binding.description.text = "${baseFile.size?.formatBytes()} ∙ ${getDateTimeFromMillis(millis = baseFile.dateModified ?: 0, dateFormat = "MMM dd", locale = Locale.ENGLISH)}"
+            binding.title.text = baseApk.title
+            binding.description.text = "${baseApk.size?.formatBytes()} ∙ ${getDateTimeFromMillis(millis = baseApk.dateModified ?: 0, dateFormat = "MMM dd yyyy", locale = Locale.ENGLISH)}"
 
             binding.root.setOnClickListener {
                 onOpenListener?.let {
-                    it(baseFile)
+                    it(baseApk)
                 }
             }
 
             binding.more.setOnClickShrinkEffectListener {
                 onMoreListener?.let {
-                    it(baseFile)
+                    it(baseApk)
                 }
             }
 
@@ -67,25 +59,25 @@ class ApkAdapter(
     }
 
     companion object {
-        private val diffUtil = object : DiffUtil.ItemCallback<BaseFile>() {
-            override fun areItemsTheSame(oldItem: BaseFile, newItem: BaseFile): Boolean =
+        private val diffUtil = object : DiffUtil.ItemCallback<BaseApk>() {
+            override fun areItemsTheSame(oldItem: BaseApk, newItem: BaseApk): Boolean =
                 oldItem.id == newItem.id
 
             @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: BaseFile, newItem: BaseFile): Boolean =
+            override fun areContentsTheSame(oldItem: BaseApk, newItem: BaseApk): Boolean =
                 oldItem == newItem
         }
     }
 
-    private var onMoreListener: ((BaseFile) -> Unit)? = null
+    private var onMoreListener: ((BaseApk) -> Unit)? = null
 
-    fun setOnMoreListener(listener: (BaseFile) -> Unit) {
+    fun setOnMoreListener(listener: (BaseApk) -> Unit) {
         onMoreListener = listener
     }
 
-    private var onOpenListener: ((BaseFile) -> Unit)? = null
+    private var onOpenListener: ((BaseApk) -> Unit)? = null
 
-    fun setOnOpenListener(listener: (BaseFile) -> Unit) {
+    fun setOnOpenListener(listener: (BaseApk) -> Unit) {
         onOpenListener = listener
     }
 }

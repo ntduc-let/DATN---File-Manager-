@@ -8,6 +8,7 @@ import com.ntduc.baseproject.databinding.FragmentAppBinding
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.adapter.FragmentAppAdapter
+import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 
 
@@ -25,7 +26,7 @@ class AppFragment : BaseFragment<FragmentAppBinding>(R.layout.fragment_app) {
 
         TabLayoutMediator(binding.tab, binding.vp) { tab, position ->
             when (position) {
-                0 -> tab.text = resources.getString(R.string.apps)
+                0 -> tab.text = resources.getString(R.string.installed)
                 1 -> tab.text = resources.getString(R.string.apks)
             }
         }.attach()
@@ -36,6 +37,11 @@ class AppFragment : BaseFragment<FragmentAppBinding>(R.layout.fragment_app) {
 
         binding.back.setOnClickShrinkEffectListener {
             findNavController().popBackStack()
+        }
+
+        binding.sort.setOnClickShrinkEffectListener {
+            val dialog = SortBottomDialogFragment()
+            dialog.show(childFragmentManager, "SortDialog")
         }
     }
 }

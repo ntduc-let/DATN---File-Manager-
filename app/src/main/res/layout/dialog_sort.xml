@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingVertical="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_medium"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp"
+            android:text="@string/sort_by"
+            android:textAllCaps="true"
+            android:textSize="12sp" />
+
+        <include
+            android:id="@+id/sort_by_name_a_z"
+            layout="@layout/item_sort" />
+
+        <include
+            android:id="@+id/sort_by_name_z_a"
+            layout="@layout/item_sort" />
+
+        <include
+            android:id="@+id/sort_by_date_new"
+            layout="@layout/item_sort" />
+
+        <include
+            android:id="@+id/sort_by_date_old"
+            layout="@layout/item_sort" />
+
+        <include
+            android:id="@+id/sort_by_size_large"
+            layout="@layout/item_sort" />
+
+        <include
+            android:id="@+id/sort_by_size_small"
+            layout="@layout/item_sort" />
+    </LinearLayout>
+</layout>

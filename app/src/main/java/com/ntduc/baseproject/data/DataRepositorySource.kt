@@ -21,7 +21,7 @@ interface DataRepositorySource {
     suspend fun requestFrames(): Flow<Resource<DataFrames>>
     suspend fun requestAllFiles(types: List<String>): Flow<Resource<Files>>
 
-    suspend fun requestAllApk(): Flow<Resource<List<BaseFile>>>
+    suspend fun requestAllApk(): Flow<Resource<List<BaseApk>>>
     suspend fun requestAllApp(isSystem: Boolean): Flow<Resource<List<BaseApp>>>
     suspend fun requestAllVideos(): Flow<Resource<List<BaseVideo>>>
     suspend fun requestAllDocument(): Flow<Resource<List<BaseFile>>>

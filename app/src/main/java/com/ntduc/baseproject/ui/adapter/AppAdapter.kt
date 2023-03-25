@@ -10,8 +10,10 @@ import com.ntduc.baseproject.data.dto.base.BaseApp
 import com.ntduc.baseproject.databinding.ItemDocumentBinding
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.formatBytes
+import com.ntduc.baseproject.utils.getDateTimeFromMillis
 import com.skydoves.bindables.BindingListAdapter
 import com.skydoves.bindables.binding
+import java.util.*
 
 class AppAdapter(
     val context: Context
@@ -31,7 +33,7 @@ class AppAdapter(
 
             binding.ic.setImageDrawable(baseApp.icon)
             binding.title.text = baseApp.name
-            binding.description.text = "${baseApp.size?.formatBytes()}"
+            binding.description.text = "${baseApp.size?.formatBytes()} ∙ ${getDateTimeFromMillis(millis = baseApp.firstInstallTime ?: 0, dateFormat = "MMM dd yyyy", locale = Locale.ENGLISH)}"
 
             binding.root.setOnClickListener {
                 onOpenListener?.let {
