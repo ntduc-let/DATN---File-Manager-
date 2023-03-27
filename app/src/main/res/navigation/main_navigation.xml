@@ -32,4 +32,12 @@
         android:id="@+id/apkDetailFragment"
         android:name="com.ntduc.baseproject.ui.component.main.fragment.home.app.ApkDetailFragment"
         android:label="ApkDetailFragment" />
+    <fragment
+        android:id="@+id/documentFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.document.DocumentFragment"
+        android:label="DocumentFragment" />
+    <fragment
+        android:id="@+id/documentDetailFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.document.DocumentDetailFragment"
+        android:label="DocumentDetailFragment" />
 </navigation>

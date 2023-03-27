@@ -25,7 +25,6 @@ import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
 import java.io.File
 
-
 class ListApkFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
 
     private val viewModel: MainViewModel by activityViewModels()
@@ -144,9 +143,11 @@ class ListApkFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
     private fun handleApkList(status: Resource<List<BaseApk>>) {
         when (status) {
             is Resource.Loading -> {
-                binding.rcv.gone()
-                binding.layoutNoItem.root.gone()
-                binding.layoutLoading.root.visible()
+                if (apkAdapter.currentList.isEmpty()){
+                    binding.rcv.gone()
+                    binding.layoutNoItem.root.gone()
+                    binding.layoutLoading.root.visible()
+                }
             }
             is Resource.Success -> status.data?.let {
                 if (it.isEmpty()) {
@@ -158,10 +159,10 @@ class ListApkFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
 
                 when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
                     SORT_BY_NAME_A_Z -> {
-                        apkAdapter.submitList(it.sortedBy { item -> item.title })
+                        apkAdapter.submitList(it.sortedBy { item -> item.displayName })
                     }
                     SORT_BY_NAME_Z_A -> {
-                        apkAdapter.submitList(it.sortedBy { item -> item.title }.reversed())
+                        apkAdapter.submitList(it.sortedBy { item -> item.displayName }.reversed())
                     }
                     SORT_BY_DATE_NEW -> {
                         apkAdapter.submitList(it.sortedBy { item -> item.dateModified }.reversed())

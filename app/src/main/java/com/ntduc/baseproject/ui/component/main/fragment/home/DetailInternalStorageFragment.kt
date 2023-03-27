@@ -59,6 +59,10 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
         binding.apps.root.setOnClickShrinkEffectListener{
             navigateToDes(R.id.appFragment)
         }
+
+        binding.document.root.setOnClickShrinkEffectListener{
+            navigateToDes(R.id.documentFragment)
+        }
     }
 
     override fun initData() {

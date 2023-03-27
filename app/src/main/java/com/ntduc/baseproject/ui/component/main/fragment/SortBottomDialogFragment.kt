@@ -65,6 +65,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             Hawk.put(SORT_BY, SORT_BY_NAME_A_Z)
             viewModel.requestAllApp()
             viewModel.requestAllApk()
+            viewModel.requestAllDocument()
             dismiss()
         }
 
@@ -72,6 +73,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             Hawk.put(SORT_BY, SORT_BY_NAME_Z_A)
             viewModel.requestAllApp()
             viewModel.requestAllApk()
+            viewModel.requestAllDocument()
             dismiss()
         }
 
@@ -79,6 +81,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             Hawk.put(SORT_BY, SORT_BY_DATE_NEW)
             viewModel.requestAllApp()
             viewModel.requestAllApk()
+            viewModel.requestAllDocument()
             dismiss()
         }
 
@@ -86,6 +89,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             Hawk.put(SORT_BY, SORT_BY_DATE_OLD)
             viewModel.requestAllApp()
             viewModel.requestAllApk()
+            viewModel.requestAllDocument()
             dismiss()
         }
 
@@ -93,6 +97,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             Hawk.put(SORT_BY, SORT_BY_SIZE_LARGE)
             viewModel.requestAllApp()
             viewModel.requestAllApk()
+            viewModel.requestAllDocument()
             dismiss()
         }
 
@@ -100,6 +105,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             Hawk.put(SORT_BY, SORT_BY_SIZE_SMALL)
             viewModel.requestAllApp()
             viewModel.requestAllApk()
+            viewModel.requestAllDocument()
             dismiss()
         }
     }

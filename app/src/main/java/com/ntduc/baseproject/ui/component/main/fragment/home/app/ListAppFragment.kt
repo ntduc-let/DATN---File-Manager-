@@ -140,9 +140,11 @@ class ListAppFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
     private fun handleAppList(status: Resource<List<BaseApp>>) {
         when (status) {
             is Resource.Loading -> {
-                binding.rcv.gone()
-                binding.layoutNoItem.root.gone()
-                binding.layoutLoading.root.visible()
+                if (appAdapter.currentList.isEmpty()) {
+                    binding.rcv.gone()
+                    binding.layoutNoItem.root.gone()
+                    binding.layoutLoading.root.visible()
+                }
             }
             is Resource.Success -> status.data?.let {
                 if (it.isEmpty()) {

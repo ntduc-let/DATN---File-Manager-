@@ -46,4 +46,19 @@ object FileTypeExtension {
             else -> R.drawable.ic_file_24dp
         }
     }
+
+    fun getIconDocument(path: String): Int {
+        val file = File(path)
+        if (file.isDirectory) return R.drawable.ic_folder_24dp
+
+        val extension = file.extension
+        return when {
+            FileType.DOCUMENT_PDF.contains(extension) -> R.drawable.ic_pdf
+            FileType.DOCUMENT_TXT.contains(extension) -> R.drawable.ic_txt
+            FileType.DOCUMENT_DOC.contains(extension) -> R.drawable.ic_doc
+            FileType.DOCUMENT_XLS.contains(extension) -> R.drawable.ic_xls
+            FileType.DOCUMENT_PPT.contains(extension) -> R.drawable.ic_ppt
+            else -> R.drawable.ic_file_24dp
+        }
+    }
 }
