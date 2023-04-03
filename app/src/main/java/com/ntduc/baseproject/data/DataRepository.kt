@@ -1,13 +1,13 @@
 package com.ntduc.baseproject.data
 
 import com.ntduc.baseproject.data.dto.base.*
-import com.ntduc.baseproject.data.dto.files.Files
-import com.ntduc.baseproject.data.remote.RemoteData
 import com.ntduc.baseproject.data.dto.frames.DataFrames
 import com.ntduc.baseproject.data.dto.login.LoginRequest
 import com.ntduc.baseproject.data.dto.login.LoginResponse
+import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
 import com.ntduc.baseproject.data.dto.recipes.Recipes
 import com.ntduc.baseproject.data.local.LocalData
+import com.ntduc.baseproject.data.remote.RemoteData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -71,12 +71,6 @@ class DataRepository @Inject constructor(private val remoteRepository: RemoteDat
         }.flowOn(ioDispatcher)
     }
 
-    override suspend fun requestAllFiles(types: List<String>): Flow<Resource<Files>> {
-        return flow<Resource<Files>> {
-            emit(localRepository.requestAllFiles(types))
-        }.flowOn(ioDispatcher)
-    }
-
     override suspend fun requestAllApk(): Flow<Resource<List<BaseApk>>> {
         return flow {
             emit(localRepository.requestAllApk())
@@ -110,6 +104,12 @@ class DataRepository @Inject constructor(private val remoteRepository: RemoteDat
     override suspend fun requestAllAudio(): Flow<Resource<List<BaseAudio>>> {
         return flow {
             emit(localRepository.requestAllAudio())
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun requestAllPlaylistAudio(): Flow<Resource<List<PlaylistAudioFile>>> {
+        return flow {
+            emit(localRepository.requestAllPlaylistAudio())
         }.flowOn(ioDispatcher)
     }
 }

@@ -10,15 +10,11 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.provider.BaseColumns
-import android.provider.MediaStore
 import android.provider.Settings
 import androidx.core.content.FileProvider
-import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FileType
 import com.ntduc.baseproject.data.dto.base.BaseApk
 import com.ntduc.baseproject.data.dto.base.BaseApp
-import com.ntduc.baseproject.data.dto.base.BaseFile
 import com.ntduc.baseproject.utils.file.getFiles
 import java.io.File
 

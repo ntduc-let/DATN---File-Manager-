@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/create_playlist"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/layout_no_item"
+            layout="@layout/layout_no_item"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@id/create_playlist"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/layout_loading"
+            layout="@layout/layout_loading"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/create_playlist"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/create_playlist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/blue_main"
+            android:elevation="0dp"
+            android:fontFamily="@font/inter_bold"
+            android:stateListAnimator="@null"
+            android:text="@string/create_new_playlist"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:cornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

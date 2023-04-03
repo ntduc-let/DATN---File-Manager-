@@ -1,18 +1,17 @@
-package com.ntduc.baseproject.ui.component.main.fragment.home.document
+package com.ntduc.baseproject.ui.component.main.fragment.home.audio
 
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
-import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.data.dto.base.BaseAudio
 import com.ntduc.baseproject.databinding.FragmentListAppBinding
 import com.ntduc.baseproject.databinding.MenuDocumentDetailBinding
-import com.ntduc.baseproject.ui.adapter.DocumentAdapter
+import com.ntduc.baseproject.ui.adapter.AudioAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.BasePopupWindow
@@ -28,45 +27,17 @@ import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
 import java.io.File
 
-class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
+class ListAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
 
     private val viewModel: MainViewModel by activityViewModels()
-    private lateinit var documentAdapter: DocumentAdapter
-    private var type = TYPE_ALL
-
-    companion object {
-        private const val TYPE = "TYPE"
-
-        const val TYPE_ALL = 1
-        const val TYPE_PDF = 2
-        const val TYPE_TXT = 3
-        const val TYPE_DOC = 4
-        const val TYPE_XLS = 5
-        const val TYPE_PPT = 6
-
-        fun newInstance(type: Int): ListDocumentFragment {
-            val args = Bundle()
-            args.putInt(TYPE, type)
-
-            val fragment = ListDocumentFragment()
-            fragment.arguments = args
-            return fragment
-        }
-    }
+    private lateinit var audioAdapter: AudioAdapter
 
     override fun initView() {
         super.initView()
 
-        if (arguments == null) {
-            findNavController().popBackStack()
-            return
-        }
-
-        type = requireArguments().getInt(TYPE, TYPE_ALL)
-
-        documentAdapter = DocumentAdapter(requireContext())
+        audioAdapter = AudioAdapter(requireContext())
         binding.rcv.apply {
-            adapter = documentAdapter
+            adapter = audioAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
@@ -74,16 +45,16 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
     override fun addEvent() {
         super.addEvent()
 
-        documentAdapter.setOnOpenListener {
+        audioAdapter.setOnOpenListener {
             File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
         }
 
-        documentAdapter.setOnMoreListener { view, baseFile ->
+        audioAdapter.setOnMoreListener { view, baseFile ->
             showMenu(view, baseFile)
         }
     }
 
-    private fun showMenu(view: View, baseFile: BaseFile) {
+    private fun showMenu(view: View, baseAudio: BaseAudio) {
         val popupBinding = MenuDocumentDetailBinding.inflate(layoutInflater)
         val popupWindow = BasePopupWindow(popupBinding.root)
         popupWindow.isTouchable = true
@@ -95,8 +66,8 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
         popupBinding.txtFavorite.text = getString(R.string.add_to_favorites)
 
         run breaking@{
-            Hawk.get(FAVORITE_DOCUMENT, arrayListOf<String>()).forEach {
-                if (it == baseFile.data) {
+            Hawk.get(FAVORITE_AUDIO, arrayListOf<String>()).forEach {
+                if (it == baseAudio.data) {
                     isFavorite = true
                     popupBinding.txtFavorite.text = getString(R.string.remove_from_favorites)
                     return@breaking
@@ -105,40 +76,40 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
         }
 
         popupBinding.share.setOnClickListener {
-            File(baseFile.data!!).share(requireContext(), "${requireContext().packageName}.provider")
+            File(baseAudio.data!!).share(requireContext(), "${requireContext().packageName}.provider")
             popupWindow.dismiss()
         }
 
         popupBinding.rename.setOnClickListener {
-            val dialog = RenameDialog.newInstance(baseFile)
+            val dialog = RenameDialog.newInstance(baseAudio)
             dialog.setOnOKListener {
-                documentAdapter.updateItem(baseFile)
-                viewModel.requestAllDocument()
+                audioAdapter.updateItem(baseAudio)
+                viewModel.requestAllAudio()
             }
             dialog.show(childFragmentManager, "RenameDialog")
             popupWindow.dismiss()
         }
 
         popupBinding.delete.setOnClickListener {
-            File(baseFile.data!!).delete(requireContext())
-            viewModel.requestAllDocument()
+            File(baseAudio.data!!).delete(requireContext())
+            viewModel.requestAllAudio()
             popupWindow.dismiss()
         }
 
         popupBinding.favorite.setOnClickListener {
             if (isFavorite) {
-                removeFavorite(baseFile)
+                removeFavorite(baseAudio)
             } else {
-                addFavorite(baseFile)
+                addFavorite(baseAudio)
             }
-            viewModel.requestAllDocument()
+            viewModel.requestAllAudio()
             popupWindow.dismiss()
         }
 
         popupBinding.info.setOnClickListener {
             val bundle = Bundle()
-            bundle.putParcelable(KEY_BASE_DOCUMENT, baseFile)
-            navigateToDes(R.id.documentDetailFragment, bundle)
+            bundle.putParcelable(KEY_BASE_AUDIO, baseAudio)
+            navigateToDes(R.id.audioDetailFragment, bundle)
             popupWindow.dismiss()
         }
 
@@ -146,80 +117,56 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
     }
 
 
-    private fun addFavorite(baseFile: BaseFile) {
-        val favorites = Hawk.get(FAVORITE_DOCUMENT, arrayListOf<String>())
+    private fun addFavorite(baseAudio: BaseAudio) {
+        val favorites = Hawk.get(FAVORITE_AUDIO, arrayListOf<String>())
 
         val newFavorites = arrayListOf<String>()
         newFavorites.addAll(favorites)
 
         favorites.forEach {
-            if (it == baseFile.data) newFavorites.remove(it)
+            if (it == baseAudio.data) newFavorites.remove(it)
         }
 
-        newFavorites.add(baseFile.data!!)
+        newFavorites.add(baseAudio.data!!)
 
-        Hawk.put(FAVORITE_DOCUMENT, newFavorites)
+        Hawk.put(FAVORITE_AUDIO, newFavorites)
     }
 
-    private fun removeFavorite(baseFile: BaseFile) {
-        val favorites = Hawk.get(FAVORITE_DOCUMENT, arrayListOf<String>())
+    private fun removeFavorite(baseAudio: BaseAudio) {
+        val favorites = Hawk.get(FAVORITE_AUDIO, arrayListOf<String>())
 
         val newFavorites = arrayListOf<String>()
         newFavorites.addAll(favorites)
 
         favorites.forEach {
-            if (it == baseFile.data) newFavorites.remove(it)
+            if (it == baseAudio.data) newFavorites.remove(it)
         }
 
-        Hawk.put(FAVORITE_DOCUMENT, newFavorites)
+        Hawk.put(FAVORITE_AUDIO, newFavorites)
     }
 
     override fun initData() {
         super.initData()
 
-        viewModel.requestAllDocument()
+        viewModel.requestAllAudio()
     }
 
     override fun addObservers() {
         super.addObservers()
-        observe(viewModel.documentListLiveData, ::handleDocumentList)
+        observe(viewModel.audioListLiveData, ::handleAudioList)
     }
 
-    private fun handleDocumentList(status: Resource<List<BaseFile>>) {
+    private fun handleAudioList(status: Resource<List<BaseAudio>>) {
         when (status) {
             is Resource.Loading -> {
-                if (documentAdapter.currentList.isEmpty()) {
+                if (audioAdapter.currentList.isEmpty()) {
                     binding.rcv.gone()
                     binding.layoutNoItem.root.gone()
                     binding.layoutLoading.root.visible()
                 }
             }
             is Resource.Success -> status.data?.let {
-                val list: List<BaseFile> = when (type) {
-                    TYPE_ALL -> {
-                        it
-                    }
-                    TYPE_PDF -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PDF }
-                    }
-                    TYPE_TXT -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.TXT }
-                    }
-                    TYPE_DOC -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.DOC }
-                    }
-                    TYPE_XLS -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.XLS }
-                    }
-                    TYPE_PPT -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PPT }
-                    }
-                    else -> {
-                        it
-                    }
-                }
-
-                if (list.isEmpty()) {
+                if (it.isEmpty()) {
                     binding.rcv.gone()
                     binding.layoutNoItem.root.visible()
                     binding.layoutLoading.root.gone()
@@ -228,22 +175,22 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
 
                 when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
                     SORT_BY_NAME_A_Z -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.displayName })
+                        audioAdapter.submitList(it.sortedBy { item -> item.displayName })
                     }
                     SORT_BY_NAME_Z_A -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.displayName }.reversed())
+                        audioAdapter.submitList(it.sortedBy { item -> item.displayName }.reversed())
                     }
                     SORT_BY_DATE_NEW -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.dateModified }.reversed())
+                        audioAdapter.submitList(it.sortedBy { item -> item.dateModified }.reversed())
                     }
                     SORT_BY_DATE_OLD -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.dateModified })
+                        audioAdapter.submitList(it.sortedBy { item -> item.dateModified })
                     }
                     SORT_BY_SIZE_LARGE -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.size }.reversed())
+                        audioAdapter.submitList(it.sortedBy { item -> item.size }.reversed())
                     }
                     SORT_BY_SIZE_SMALL -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.size })
+                        audioAdapter.submitList(it.sortedBy { item -> item.size })
                     }
                 }
 

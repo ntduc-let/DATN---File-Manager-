@@ -56,12 +56,16 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
             findNavController().popBackStack()
         }
 
-        binding.apps.root.setOnClickShrinkEffectListener{
+        binding.apps.root.setOnClickShrinkEffectListener {
             navigateToDes(R.id.appFragment)
         }
 
-        binding.document.root.setOnClickShrinkEffectListener{
+        binding.document.root.setOnClickShrinkEffectListener {
             navigateToDes(R.id.documentFragment)
+        }
+
+        binding.audio.root.setOnClickShrinkEffectListener {
+            navigateToDes(R.id.audioFragment)
         }
     }
 
@@ -114,11 +118,11 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
                     val percentUsed = (sizeUsed.toDouble() / useSize) * 100
 
                     withContext(Dispatchers.Main) {
-                        if (sizeUsed != 0L){
+                        if (sizeUsed != 0L) {
                             binding.apps.description.text = "${it.size} items ∙ ${sizeUsed.formatBytes()}"
                             binding.apps.progress.visible()
                             binding.apps.progress.progress = percentUsed.toInt()
-                        }else{
+                        } else {
                             binding.apps.description.text = "${it.size} items"
                             binding.apps.progress.gone()
                         }

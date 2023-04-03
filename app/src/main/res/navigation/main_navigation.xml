@@ -40,4 +40,20 @@
         android:id="@+id/documentDetailFragment"
         android:name="com.ntduc.baseproject.ui.component.main.fragment.home.document.DocumentDetailFragment"
         android:label="DocumentDetailFragment" />
+    <fragment
+        android:id="@+id/audioDetailFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.audio.AudioDetailFragment"
+        android:label="AudioDetailFragment" />
+    <fragment
+        android:id="@+id/audioFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.audio.AudioFragment"
+        android:label="AudioFragment" />
+    <fragment
+        android:id="@+id/folderAudioDetailFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.audio.FolderAudioDetailFragment"
+        android:label="FolderAudioDetailFragment" />
+    <fragment
+        android:id="@+id/listAudioInFolderFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.audio.ListAudioInFolderFragment"
+        android:label="ListAudioInFolderFragment" />
 </navigation>

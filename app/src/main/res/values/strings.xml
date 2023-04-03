@@ -55,5 +55,10 @@
     <string name="rename">Rename</string>
     <string name="name_your_document">New name</string>
     <string name="cancel">Cancel</string>
+    <string name="folder">Folder</string>
+    <string name="playlist">Playlist</string>
+    <string name="time">Time</string>
+    <string name="folder_info">Folder info</string>
+    <string name="create_new_playlist">Create new playlist</string>
 
 </resources>

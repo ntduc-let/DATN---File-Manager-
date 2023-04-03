@@ -2,13 +2,17 @@ package com.ntduc.baseproject.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.constant.FAVORITE_DOCUMENT
+import com.ntduc.baseproject.constant.FAVORITE_AUDIO
 import com.ntduc.baseproject.constant.FileTypeExtension
+import com.ntduc.baseproject.data.dto.base.BaseAudio
 import com.ntduc.baseproject.data.dto.base.BaseFile
 import com.ntduc.baseproject.databinding.ItemDocumentBinding
 import com.ntduc.baseproject.utils.*
@@ -21,9 +25,9 @@ import com.skydoves.bindables.binding
 import java.util.*
 
 
-class DocumentAdapter(
+class AudioAdapter(
     val context: Context
-) : BindingListAdapter<BaseFile, DocumentAdapter.ItemViewHolder>(diffUtil) {
+) : BindingListAdapter<BaseAudio, AudioAdapter.ItemViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder =
         parent.binding<ItemDocumentBinding>(R.layout.item_document).let(::ItemViewHolder)
@@ -35,32 +39,41 @@ class DocumentAdapter(
         private val binding: ItemDocumentBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(baseFile: BaseFile) {
+        fun bind(baseAudio: BaseAudio) {
 
             binding.favorite.gone()
             run breaking@{
-                Hawk.get(FAVORITE_DOCUMENT, arrayListOf<String>()).forEach {
-                    if (it == baseFile.data) {
+                Hawk.get(FAVORITE_AUDIO, arrayListOf<String>()).forEach {
+                    if (it == baseAudio.data) {
                         binding.favorite.visible()
                         return@breaking
                     }
                 }
             }
 
-            binding.ic.setImageResource(FileTypeExtension.getIconDocument(baseFile.data!!))
+            val image = try {
+                val mData = MediaMetadataRetriever()
+                mData.setDataSource(baseAudio.data)
+                val art = mData.embeddedPicture
+                BitmapFactory.decodeByteArray(art, 0, art!!.size)
+            } catch (e: Exception) {
+                null
+            }
 
-            binding.title.text = baseFile.displayName
-            binding.description.text = "${baseFile.size?.formatBytes()} ∙ ${getDateTimeFromMillis(millis = baseFile.dateModified ?: 0, dateFormat = "MMM dd yyyy", locale = Locale.ENGLISH)}"
+            context.loadImg(imgUrl = image, placeHolder = R.color.black, error = FileTypeExtension.getIconFile(baseAudio.data!!), view = binding.ic)
+
+            binding.title.text = baseAudio.displayName
+            binding.description.text = "${baseAudio.size?.formatBytes()} ∙ ${getDateTimeFromMillis(millis = baseAudio.dateModified ?: 0, dateFormat = "MMM dd yyyy", locale = Locale.ENGLISH)}"
 
             binding.root.setOnClickListener {
                 onOpenListener?.let {
-                    it(baseFile)
+                    it(baseAudio)
                 }
             }
 
             binding.more.setOnClickShrinkEffectListener {
                 onMoreListener?.let {
-                    it(binding.root, baseFile)
+                    it(binding.root, baseAudio)
                 }
             }
 
@@ -98,25 +111,25 @@ class DocumentAdapter(
     }
 
     companion object {
-        private val diffUtil = object : DiffUtil.ItemCallback<BaseFile>() {
-            override fun areItemsTheSame(oldItem: BaseFile, newItem: BaseFile): Boolean =
+        private val diffUtil = object : DiffUtil.ItemCallback<BaseAudio>() {
+            override fun areItemsTheSame(oldItem: BaseAudio, newItem: BaseAudio): Boolean =
                 oldItem.id == newItem.id
 
             @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: BaseFile, newItem: BaseFile): Boolean =
+            override fun areContentsTheSame(oldItem: BaseAudio, newItem: BaseAudio): Boolean =
                 oldItem == newItem
         }
     }
 
-    private var onMoreListener: ((View, BaseFile) -> Unit)? = null
+    private var onMoreListener: ((View, BaseAudio) -> Unit)? = null
 
-    fun setOnMoreListener(listener: (View, BaseFile) -> Unit) {
+    fun setOnMoreListener(listener: (View, BaseAudio) -> Unit) {
         onMoreListener = listener
     }
 
-    private var onOpenListener: ((BaseFile) -> Unit)? = null
+    private var onOpenListener: ((BaseAudio) -> Unit)? = null
 
-    fun setOnOpenListener(listener: (BaseFile) -> Unit) {
+    fun setOnOpenListener(listener: (BaseAudio) -> Unit) {
         onOpenListener = listener
     }
 }

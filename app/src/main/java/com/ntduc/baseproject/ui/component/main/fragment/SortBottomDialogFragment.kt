@@ -66,6 +66,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             viewModel.requestAllApp()
             viewModel.requestAllApk()
             viewModel.requestAllDocument()
+            viewModel.requestAllAudio()
             dismiss()
         }
 
@@ -74,6 +75,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             viewModel.requestAllApp()
             viewModel.requestAllApk()
             viewModel.requestAllDocument()
+            viewModel.requestAllAudio()
             dismiss()
         }
 
@@ -82,6 +84,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             viewModel.requestAllApp()
             viewModel.requestAllApk()
             viewModel.requestAllDocument()
+            viewModel.requestAllAudio()
             dismiss()
         }
 
@@ -90,6 +93,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             viewModel.requestAllApp()
             viewModel.requestAllApk()
             viewModel.requestAllDocument()
+            viewModel.requestAllAudio()
             dismiss()
         }
 
@@ -98,6 +102,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             viewModel.requestAllApp()
             viewModel.requestAllApk()
             viewModel.requestAllDocument()
+            viewModel.requestAllAudio()
             dismiss()
         }
 
@@ -106,6 +111,7 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
             viewModel.requestAllApp()
             viewModel.requestAllApk()
             viewModel.requestAllDocument()
+            viewModel.requestAllAudio()
             dismiss()
         }
     }

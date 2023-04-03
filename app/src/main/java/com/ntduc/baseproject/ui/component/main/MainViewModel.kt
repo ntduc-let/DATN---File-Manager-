@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ntduc.baseproject.data.DataRepositorySource
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.*
+import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
 import com.ntduc.baseproject.ui.base.BaseViewModel
 import com.ntduc.baseproject.utils.wrapEspressoIdlingResource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -112,6 +113,21 @@ class MainViewModel @Inject constructor(
             wrapEspressoIdlingResource {
                 repository.requestAllAudio().collect {
                     audioListLiveDataPrivate.value = it
+                }
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val playlistAudioLiveDataPrivate = MutableLiveData<Resource<List<PlaylistAudioFile>>>()
+    val playlistAudioLiveData: LiveData<Resource<List<PlaylistAudioFile>>> get() = playlistAudioLiveDataPrivate
+
+    fun requestAllPlaylistAudio() {
+        viewModelScope.launch {
+            playlistAudioLiveDataPrivate.value = Resource.Loading()
+            wrapEspressoIdlingResource {
+                repository.requestAllPlaylistAudio().collect {
+                    playlistAudioLiveDataPrivate.value = it
                 }
             }
         }

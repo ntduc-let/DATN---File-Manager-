@@ -4,7 +4,6 @@ import android.os.Bundle
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.data.dto.base.BaseFile
 import com.ntduc.baseproject.databinding.DialogRenameBinding
-import com.ntduc.baseproject.databinding.DialogRequestPermissionBinding
 import com.ntduc.baseproject.ui.base.BaseDialogFragment
 import com.ntduc.baseproject.utils.file.renameTo
 import com.ntduc.baseproject.utils.toast.shortToast

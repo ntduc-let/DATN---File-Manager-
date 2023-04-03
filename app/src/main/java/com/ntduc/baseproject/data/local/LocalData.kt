@@ -4,12 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.ntduc.baseproject.constant.FAVOURITES_KEY
 import com.ntduc.baseproject.constant.FileType
+import com.ntduc.baseproject.constant.PLAYLIST_AUDIO
 import com.ntduc.baseproject.constant.SHARED_PREFERENCES_FILE_NAME
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.*
-import com.ntduc.baseproject.data.dto.files.Files
 import com.ntduc.baseproject.data.dto.login.LoginRequest
 import com.ntduc.baseproject.data.dto.login.LoginResponse
+import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
 import com.ntduc.baseproject.data.error.PASS_WORD_ERROR
 import com.ntduc.baseproject.utils.file.getAudios
 import com.ntduc.baseproject.utils.file.getFiles
@@ -17,6 +18,7 @@ import com.ntduc.baseproject.utils.file.getImages
 import com.ntduc.baseproject.utils.file.getVideos
 import com.ntduc.baseproject.utils.getApks
 import com.ntduc.baseproject.utils.getApps
+import com.orhanobut.hawk.Hawk
 import javax.inject.Inject
 
 /**
@@ -74,11 +76,6 @@ class LocalData @Inject constructor(val context: Context) {
         return Resource.Success(isSuccess)
     }
 
-    fun requestAllFiles(types: List<String>): Resource<Files> {
-        val baseFiles = context.getFiles(types = types)
-        return Resource.Success(Files(baseFiles))
-    }
-
     fun requestAllApk(): Resource<List<BaseApk>> {
         val baseApkList = context.getApks()
         return Resource.Success(baseApkList)
@@ -107,6 +104,11 @@ class LocalData @Inject constructor(val context: Context) {
     fun requestAllAudio(): Resource<List<BaseAudio>> {
         val baseAudioList = context.getAudios()
         return Resource.Success(baseAudioList)
+    }
+
+    fun requestAllPlaylistAudio(): Resource<List<PlaylistAudioFile>> {
+        val list: List<PlaylistAudioFile> = Hawk.get(PLAYLIST_AUDIO, listOf())
+        return Resource.Success(list)
     }
 }
 
