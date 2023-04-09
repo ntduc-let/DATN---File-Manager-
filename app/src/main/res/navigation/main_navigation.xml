@@ -56,4 +56,36 @@
         android:id="@+id/listAudioInFolderFragment"
         android:name="com.ntduc.baseproject.ui.component.main.fragment.home.audio.ListAudioInFolderFragment"
         android:label="ListAudioInFolderFragment" />
+    <fragment
+        android:id="@+id/imageFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.image.ImageFragment"
+        android:label="ImageFragment" />
+    <fragment
+        android:id="@+id/imageDetailFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.image.ImageDetailFragment"
+        android:label="ImageDetailFragment" />
+    <fragment
+        android:id="@+id/listImageInFolderFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.image.ListImageInFolderFragment"
+        android:label="ListImageInFolderFragment" />
+    <fragment
+        android:id="@+id/folderImageDetailFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.image.FolderImageDetailFragment"
+        android:label="FolderImageDetailFragment" />
+    <fragment
+        android:id="@+id/videoFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.video.VideoFragment"
+        android:label="VideoFragment" />
+    <fragment
+        android:id="@+id/videoDetailFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.video.VideoDetailFragment"
+        android:label="VideoDetailFragment" />
+    <fragment
+        android:id="@+id/listVideoInFolderFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.video.ListVideoInFolderFragment"
+        android:label="ListVideoInFolderFragment" />
+    <fragment
+        android:id="@+id/folderVideoDetailFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.video.FolderVideoDetailFragment"
+        android:label="FolderVideoDetailFragment" />
 </navigation>

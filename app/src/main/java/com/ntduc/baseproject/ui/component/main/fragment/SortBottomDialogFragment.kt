@@ -52,8 +52,8 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
                 binding.sortBySizeLarge.select.visible()
             }
             SORT_BY_SIZE_SMALL -> {
-                binding.sortBySizeLarge.title.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue_main))
-                binding.sortBySizeLarge.select.visible()
+                binding.sortBySizeSmall.title.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue_main))
+                binding.sortBySizeSmall.select.visible()
             }
         }
     }
@@ -63,57 +63,48 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
 
         binding.sortByNameAZ.root.setOnClickListener {
             Hawk.put(SORT_BY, SORT_BY_NAME_A_Z)
-            viewModel.requestAllApp()
-            viewModel.requestAllApk()
-            viewModel.requestAllDocument()
-            viewModel.requestAllAudio()
+            requestAllFile()
             dismiss()
         }
 
         binding.sortByNameZA.root.setOnClickListener {
             Hawk.put(SORT_BY, SORT_BY_NAME_Z_A)
-            viewModel.requestAllApp()
-            viewModel.requestAllApk()
-            viewModel.requestAllDocument()
-            viewModel.requestAllAudio()
+            requestAllFile()
             dismiss()
         }
 
         binding.sortByDateNew.root.setOnClickListener {
             Hawk.put(SORT_BY, SORT_BY_DATE_NEW)
-            viewModel.requestAllApp()
-            viewModel.requestAllApk()
-            viewModel.requestAllDocument()
-            viewModel.requestAllAudio()
+            requestAllFile()
             dismiss()
         }
 
         binding.sortByDateOld.root.setOnClickListener {
             Hawk.put(SORT_BY, SORT_BY_DATE_OLD)
-            viewModel.requestAllApp()
-            viewModel.requestAllApk()
-            viewModel.requestAllDocument()
-            viewModel.requestAllAudio()
+            requestAllFile()
             dismiss()
         }
 
         binding.sortBySizeLarge.root.setOnClickListener {
             Hawk.put(SORT_BY, SORT_BY_SIZE_LARGE)
-            viewModel.requestAllApp()
-            viewModel.requestAllApk()
-            viewModel.requestAllDocument()
-            viewModel.requestAllAudio()
+            requestAllFile()
             dismiss()
         }
 
         binding.sortBySizeSmall.root.setOnClickListener {
             Hawk.put(SORT_BY, SORT_BY_SIZE_SMALL)
-            viewModel.requestAllApp()
-            viewModel.requestAllApk()
-            viewModel.requestAllDocument()
-            viewModel.requestAllAudio()
+            requestAllFile()
             dismiss()
         }
+    }
+
+    private fun requestAllFile() {
+        viewModel.requestAllApp()
+        viewModel.requestAllApk()
+        viewModel.requestAllDocument()
+        viewModel.requestAllAudio()
+        viewModel.requestAllImages()
+        viewModel.requestAllVideos()
     }
 
     private fun resetSort() {

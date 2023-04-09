@@ -67,6 +67,14 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
         binding.audio.root.setOnClickShrinkEffectListener {
             navigateToDes(R.id.audioFragment)
         }
+
+        binding.images.root.setOnClickShrinkEffectListener{
+            navigateToDes(R.id.imageFragment)
+        }
+
+        binding.videos.root.setOnClickShrinkEffectListener{
+            navigateToDes(R.id.videoFragment)
+        }
     }
 
     override fun initData() {

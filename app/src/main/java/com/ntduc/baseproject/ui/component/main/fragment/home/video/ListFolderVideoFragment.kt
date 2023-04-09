@@ -1,4 +1,4 @@
-package com.ntduc.baseproject.ui.component.main.fragment.home.audio
+package com.ntduc.baseproject.ui.component.main.fragment.home.video
 
 import android.os.Bundle
 import android.view.Gravity
@@ -9,19 +9,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
-import com.ntduc.baseproject.data.dto.base.BaseAudio
 import com.ntduc.baseproject.data.dto.base.BaseFile
-import com.ntduc.baseproject.data.dto.folder.FolderAudioFile
+import com.ntduc.baseproject.data.dto.base.BaseVideo
+import com.ntduc.baseproject.data.dto.folder.FolderVideoFile
 import com.ntduc.baseproject.databinding.FragmentListAppBinding
 import com.ntduc.baseproject.databinding.MenuFolderDetailBinding
-import com.ntduc.baseproject.ui.adapter.FolderAudioAdapter
+import com.ntduc.baseproject.ui.adapter.FolderVideoAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.BasePopupWindow
-import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.activity.getStatusBarHeight
 import com.ntduc.baseproject.utils.context.displayHeight
+import com.ntduc.baseproject.utils.dp
 import com.ntduc.baseproject.utils.file.delete
+import com.ntduc.baseproject.utils.navigateToDes
+import com.ntduc.baseproject.utils.observe
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
@@ -30,17 +32,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class ListFolderAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
+class ListFolderVideoFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
 
     private val viewModel: MainViewModel by activityViewModels()
-    private lateinit var folderAudioAdapter: FolderAudioAdapter
+    private lateinit var folderVideoAdapter: FolderVideoAdapter
 
     override fun initView() {
         super.initView()
 
-        folderAudioAdapter = FolderAudioAdapter(requireContext())
+        folderVideoAdapter = FolderVideoAdapter(requireContext())
         binding.rcv.apply {
-            adapter = folderAudioAdapter
+            adapter = folderVideoAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
@@ -48,18 +50,18 @@ class ListFolderAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
     override fun addEvent() {
         super.addEvent()
 
-        folderAudioAdapter.setOnOpenListener {
+        folderVideoAdapter.setOnOpenListener {
             val bundle = Bundle()
-            bundle.putParcelable(KEY_BASE_FOLDER_AUDIO, it)
-            navigateToDes(R.id.listAudioInFolderFragment, bundle)
+            bundle.putParcelable(KEY_BASE_FOLDER_VIDEO, it)
+            navigateToDes(R.id.listVideoInFolderFragment, bundle)
         }
 
-        folderAudioAdapter.setOnMoreListener { view, folderAudioFile ->
-            showMenu(view, folderAudioFile)
+        folderVideoAdapter.setOnMoreListener { view, folderVideoFile ->
+            showMenu(view, folderVideoFile)
         }
     }
 
-    private fun showMenu(view: View, folderAudioFile: FolderAudioFile) {
+    private fun showMenu(view: View, folderVideoFile: FolderVideoFile) {
         val popupBinding = MenuFolderDetailBinding.inflate(layoutInflater)
         val popupWindow = BasePopupWindow(popupBinding.root)
         popupWindow.isTouchable = true
@@ -68,18 +70,18 @@ class ListFolderAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
         popupWindow.elevation = 10f
 
         popupBinding.delete.setOnClickListener {
-            folderAudioFile.listFile.forEach {
+            folderVideoFile.listFile.forEach {
                 File(it.data!!).delete(requireContext())
             }
-            viewModel.requestAllAudio()
+            viewModel.requestAllVideos()
             popupWindow.dismiss()
         }
 
 
         popupBinding.info.setOnClickListener {
             val bundle = Bundle()
-            bundle.putParcelable(KEY_BASE_FOLDER_AUDIO, folderAudioFile)
-            navigateToDes(R.id.folderAudioDetailFragment, bundle)
+            bundle.putParcelable(KEY_BASE_FOLDER_VIDEO, folderVideoFile)
+            navigateToDes(R.id.folderVideoDetailFragment, bundle)
             popupWindow.dismiss()
         }
 
@@ -89,18 +91,18 @@ class ListFolderAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
     override fun initData() {
         super.initData()
 
-        viewModel.requestAllAudio()
+        viewModel.requestAllVideos()
     }
 
     override fun addObservers() {
         super.addObservers()
-        observe(viewModel.audioListLiveData, ::handleAudioList)
+        observe(viewModel.videoListLiveData, ::handleVideoList)
     }
 
-    private fun handleAudioList(status: Resource<List<BaseAudio>>) {
+    private fun handleVideoList(status: Resource<List<BaseVideo>>) {
         when (status) {
             is Resource.Loading -> {
-                if (folderAudioAdapter.currentList.isEmpty()) {
+                if (folderVideoAdapter.currentList.isEmpty()) {
                     binding.rcv.gone()
                     binding.layoutNoItem.root.gone()
                     binding.layoutLoading.root.visible()
@@ -112,7 +114,6 @@ class ListFolderAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
 
                     withContext(Dispatchers.Main) {
                         if (result.isEmpty()) {
-
                             binding.rcv.gone()
                             binding.layoutNoItem.root.visible()
                             binding.layoutLoading.root.gone()
@@ -120,22 +121,22 @@ class ListFolderAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
                         }
                         when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
                             SORT_BY_NAME_A_Z -> {
-                                folderAudioAdapter.submitList(result.sortedBy { item -> item.baseFile!!.displayName })
+                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.displayName })
                             }
                             SORT_BY_NAME_Z_A -> {
-                                folderAudioAdapter.submitList(result.sortedBy { item -> item.baseFile!!.displayName }.reversed())
+                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.displayName }.reversed())
                             }
                             SORT_BY_DATE_NEW -> {
-                                folderAudioAdapter.submitList(result.sortedBy { item -> item.baseFile!!.dateModified }.reversed())
+                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.dateModified }.reversed())
                             }
                             SORT_BY_DATE_OLD -> {
-                                folderAudioAdapter.submitList(result.sortedBy { item -> item.baseFile!!.dateModified })
+                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.dateModified })
                             }
                             SORT_BY_SIZE_LARGE -> {
-                                folderAudioAdapter.submitList(result.sortedBy { item -> item.baseFile!!.size }.reversed())
+                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.size }.reversed())
                             }
                             SORT_BY_SIZE_SMALL -> {
-                                folderAudioAdapter.submitList(result.sortedBy { item -> item.baseFile!!.size })
+                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.size })
                             }
                         }
 
@@ -153,13 +154,13 @@ class ListFolderAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
         }
     }
 
-    private fun filterFolderFile(list: List<BaseAudio>): ArrayList<FolderAudioFile> {
-        val listFolderAudio = ArrayList<FolderAudioFile>()
+    private fun filterFolderFile(list: List<BaseVideo>): ArrayList<FolderVideoFile> {
+        val listFolderVideo = ArrayList<FolderVideoFile>()
         var index = 1L
         for (audio in list) {
-            val pos = checkFolderByPath(audio, listFolderAudio)
+            val pos = checkFolderByPath(audio, listFolderVideo)
             if (pos >= 0) {
-                listFolderAudio[pos].listFile.add(audio)
+                listFolderVideo[pos].listFile.add(audio)
             } else {
                 val f = File(audio.data!!)
                 val folder = BaseFile(
@@ -173,21 +174,21 @@ class ListFolderAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
                     getPathFolderByPath(f.path)
                 )
 
-                val folderAudio = FolderAudioFile(folder)
-                folderAudio.listFile.add(audio)
+                val folderVideo = FolderVideoFile(folder)
+                folderVideo.listFile.add(audio)
 
-                listFolderAudio.add(folderAudio)
+                listFolderVideo.add(folderVideo)
             }
         }
-        return listFolderAudio
+        return listFolderVideo
     }
 
     private fun checkFolderByPath(
-        baseAudio: BaseAudio,
-        listFolderAudio: ArrayList<FolderAudioFile>
+        baseVideo: BaseVideo,
+        listFolderVideo: ArrayList<FolderVideoFile>
     ): Int {
-        for (i in listFolderAudio.indices) {
-            if (getPathFolderByPath(baseAudio.data!!) == listFolderAudio[i].baseFile!!.data) {
+        for (i in listFolderVideo.indices) {
+            if (getPathFolderByPath(baseVideo.data!!) == listFolderVideo[i].baseFile!!.data) {
                 return i
             }
         }

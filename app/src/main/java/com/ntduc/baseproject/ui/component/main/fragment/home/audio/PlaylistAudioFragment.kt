@@ -15,7 +15,6 @@ import com.ntduc.baseproject.data.dto.folder.FolderAudioFile
 import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
 import com.ntduc.baseproject.databinding.FragmentPlaylistAudioBinding
 import com.ntduc.baseproject.databinding.MenuFolderDetailBinding
-import com.ntduc.baseproject.ui.adapter.FolderAudioAdapter
 import com.ntduc.baseproject.ui.adapter.PlaylistAudioAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
@@ -161,7 +160,7 @@ class PlaylistAudioFragment : BaseFragment<FragmentPlaylistAudioBinding>(R.layou
         val listFolderAudio = ArrayList<FolderAudioFile>()
         var index = 1L
         for (audio in list) {
-            val pos = checkFolderAudioByPath(audio, listFolderAudio)
+            val pos = checkFolderByPath(audio, listFolderAudio)
             if (pos >= 0) {
                 listFolderAudio[pos].listFile.add(audio)
             } else {
@@ -186,7 +185,7 @@ class PlaylistAudioFragment : BaseFragment<FragmentPlaylistAudioBinding>(R.layou
         return listFolderAudio
     }
 
-    private fun checkFolderAudioByPath(
+    private fun checkFolderByPath(
         baseAudio: BaseAudio,
         listFolderAudio: ArrayList<FolderAudioFile>
     ): Int {

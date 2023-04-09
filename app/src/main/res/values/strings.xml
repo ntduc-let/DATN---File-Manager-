@@ -60,5 +60,6 @@
     <string name="time">Time</string>
     <string name="folder_info">Folder info</string>
     <string name="create_new_playlist">Create new playlist</string>
+    <string name="resolution">Resolution</string>
 
 </resources>
