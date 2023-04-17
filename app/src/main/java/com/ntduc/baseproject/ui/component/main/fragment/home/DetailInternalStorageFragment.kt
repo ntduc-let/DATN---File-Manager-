@@ -1,5 +1,6 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home
 
+import android.os.Bundle
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -57,23 +58,23 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
         }
 
         binding.apps.root.setOnClickShrinkEffectListener {
-            navigateToDes(R.id.appFragment)
+            navigateToDes(R.id.appFragment, Bundle())
         }
 
         binding.document.root.setOnClickShrinkEffectListener {
-            navigateToDes(R.id.documentFragment)
+            navigateToDes(R.id.documentFragment, Bundle())
         }
 
         binding.audio.root.setOnClickShrinkEffectListener {
-            navigateToDes(R.id.audioFragment)
+            navigateToDes(R.id.audioFragment, Bundle())
         }
 
         binding.images.root.setOnClickShrinkEffectListener{
-            navigateToDes(R.id.imageFragment)
+            navigateToDes(R.id.imageFragment, Bundle())
         }
 
         binding.videos.root.setOnClickShrinkEffectListener{
-            navigateToDes(R.id.videoFragment)
+            navigateToDes(R.id.videoFragment, Bundle())
         }
     }
 

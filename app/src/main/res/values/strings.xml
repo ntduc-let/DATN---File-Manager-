@@ -13,6 +13,7 @@
     <string name="internal_storage">Internal Storage</string>
     <string name="view_details">View Details</string>
     <string name="see_all">See all</string>
+    <string name="favorite_files">Favorite Files</string>
     <string name="recent_files">Recent Files</string>
     <string name="content_request_permission_read_all_file">Allow access to your all files can help you quickly find your photos, videos, documents and more</string>
     <string name="allow">Allow</string>
@@ -61,5 +62,6 @@
     <string name="folder_info">Folder info</string>
     <string name="create_new_playlist">Create new playlist</string>
     <string name="resolution">Resolution</string>
+    <string name="favorite">Favorite</string>
 
 </resources>

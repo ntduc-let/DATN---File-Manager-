@@ -6,9 +6,10 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FAVORITE_AUDIO
 import com.ntduc.baseproject.constant.FileTypeExtension
@@ -22,11 +23,15 @@ import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
 import com.skydoves.bindables.BindingListAdapter
 import com.skydoves.bindables.binding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 
 class AudioAdapter(
-    val context: Context
+    val context: Context,
+    val lifecycleScope: LifecycleCoroutineScope
 ) : BindingListAdapter<BaseAudio, AudioAdapter.ItemViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder =
@@ -51,16 +56,20 @@ class AudioAdapter(
                 }
             }
 
-            val image = try {
-                val mData = MediaMetadataRetriever()
-                mData.setDataSource(baseAudio.data)
-                val art = mData.embeddedPicture
-                BitmapFactory.decodeByteArray(art, 0, art!!.size)
-            } catch (e: Exception) {
-                null
-            }
+            lifecycleScope.launch(Dispatchers.IO) {
+                val image = try {
+                    val mData = MediaMetadataRetriever()
+                    mData.setDataSource(baseAudio.data)
+                    val art = mData.embeddedPicture
+                    BitmapFactory.decodeByteArray(art, 0, art!!.size)
+                } catch (e: Exception) {
+                    null
+                }
 
-            context.loadImg(imgUrl = image, placeHolder = R.color.black, error = FileTypeExtension.getIconFile(baseAudio.data!!), view = binding.ic)
+                withContext(Dispatchers.Main){
+                    context.loadImg(imgUrl = image, placeHolder = R.color.black, error = FileTypeExtension.getIconFile(baseAudio.data!!), view = binding.ic)
+                }
+            }
 
             binding.title.text = baseAudio.displayName
             binding.description.text = "${baseAudio.size?.formatBytes()} ∙ ${getDateTimeFromMillis(millis = baseAudio.dateModified ?: 0, dateFormat = "MMM dd yyyy", locale = Locale.ENGLISH)}"

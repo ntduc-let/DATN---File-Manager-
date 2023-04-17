@@ -1,9 +1,11 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.app
 
+import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
@@ -28,11 +30,26 @@ import kotlinx.coroutines.withContext
 
 class ListAppFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
 
+    companion object {
+
+        fun newInstance(isFavorite: Boolean): ListAppFragment {
+            val args = Bundle()
+            args.putBoolean(IS_FAVORITE, isFavorite)
+
+            val fragment = ListAppFragment()
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var appAdapter: AppAdapter
+    private var isFavorite: Boolean = false
 
     override fun initView() {
         super.initView()
+
+        isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
 
         appAdapter = AppAdapter(requireContext())
         binding.rcv.apply {
@@ -82,11 +99,10 @@ class ListAppFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
         popupBinding.favorite.setOnClickListener {
             if (isFavorite) {
                 removeFavorite(baseApp)
-                appAdapter.updateItem(baseApp)
             } else {
                 addFavorite(baseApp)
-                appAdapter.updateItem(baseApp)
             }
+            viewModel.requestAllApp()
             popupWindow.dismiss()
         }
 
@@ -147,40 +163,42 @@ class ListAppFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
                 }
             }
             is Resource.Success -> status.data?.let {
-                if (it.isEmpty()) {
-                    binding.rcv.gone()
-                    binding.layoutNoItem.root.visible()
-                    binding.layoutLoading.root.gone()
-                    return
-                }
-
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val result = arrayListOf<BaseApp>()
-                    it.forEach { item ->
-                        if (item.packageName != requireContext().packageName) result.add(item)
+                    val listQuery = arrayListOf<BaseApp>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_APP, arrayListOf<String>())
+                        it.forEach {
+                            if (listFavorite.contains(it.packageName)) listQuery.add(it)
+                        }
+                    } else {
+                        listQuery.addAll(it)
+                    }
+
+                    if (listQuery.isEmpty()) {
+                        withContext(Dispatchers.Main) {
+                            binding.rcv.gone()
+                            binding.layoutNoItem.root.visible()
+                            binding.layoutLoading.root.gone()
+                            return@withContext
+                        }
+                        return@launch
+                    }
+
+                    val temp = arrayListOf<BaseApp>()
+                    listQuery.forEach { item ->
+                        if (item.packageName != requireContext().packageName) temp.add(item)
+                    }
+                    val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
+                        SORT_BY_NAME_A_Z -> temp.sortedBy { item -> item.name }
+                        SORT_BY_NAME_Z_A -> temp.sortedBy { item -> item.name }.reversed()
+                        SORT_BY_DATE_NEW -> temp.sortedBy { item -> item.firstInstallTime }.reversed()
+                        SORT_BY_DATE_OLD -> temp.sortedBy { item -> item.firstInstallTime }
+                        SORT_BY_SIZE_LARGE -> temp.sortedBy { item -> item.size }.reversed()
+                        SORT_BY_SIZE_SMALL -> temp.sortedBy { item -> item.size }
+                        else -> listOf()
                     }
                     withContext(Dispatchers.Main) {
-                        when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
-                            SORT_BY_NAME_A_Z -> {
-                                appAdapter.submitList(result.sortedBy { item -> item.name })
-                            }
-                            SORT_BY_NAME_Z_A -> {
-                                appAdapter.submitList(result.sortedBy { item -> item.name }.reversed())
-                            }
-                            SORT_BY_DATE_NEW -> {
-                                appAdapter.submitList(result.sortedBy { item -> item.firstInstallTime }.reversed())
-                            }
-                            SORT_BY_DATE_OLD -> {
-                                appAdapter.submitList(result.sortedBy { item -> item.firstInstallTime })
-                            }
-                            SORT_BY_SIZE_LARGE -> {
-                                appAdapter.submitList(result.sortedBy { item -> item.size }.reversed())
-                            }
-                            SORT_BY_SIZE_SMALL -> {
-                                appAdapter.submitList(result.sortedBy { item -> item.size })
-                            }
-                        }
-
+                        appAdapter.submitList(result)
                         binding.rcv.visible()
                         binding.layoutNoItem.root.gone()
                         binding.layoutLoading.root.gone()

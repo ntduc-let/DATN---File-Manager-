@@ -2,17 +2,13 @@ package com.ntduc.baseproject.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FAVORITE_APK
-import com.ntduc.baseproject.constant.FAVORITE_APP
 import com.ntduc.baseproject.data.dto.base.BaseApk
-import com.ntduc.baseproject.data.dto.base.BaseApp
 import com.ntduc.baseproject.databinding.ItemDocumentBinding
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
@@ -73,35 +69,6 @@ class ApkAdapter(
 
             binding.executePendingBindings()
         }
-    }
-
-    fun updateItem(baseApk: BaseApk) {
-        var position = -1
-        run breaking@{
-            currentList.indices.forEach {
-                if (currentList[it].data == baseApk.data) {
-                    position = it
-                    return@breaking
-                }
-            }
-        }
-
-        if (position != -1) notifyItemChanged(position)
-    }
-
-    fun removeItem(baseApk: BaseApk) {
-        var position = -1
-        run breaking@{
-            currentList.indices.forEach {
-                if (currentList[it].data == baseApk.data) {
-                    currentList.removeAt(it)
-                    position = it
-                    return@breaking
-                }
-            }
-        }
-
-        if (position != -1) notifyItemRemoved(position)
     }
 
     companion object {

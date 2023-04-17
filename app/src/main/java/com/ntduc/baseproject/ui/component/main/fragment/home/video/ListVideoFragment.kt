@@ -15,6 +15,7 @@ import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.ui.component.main.dialog.VideoMoreDialog
+import com.ntduc.baseproject.ui.component.main.fragment.home.app.AppFragment
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.view.gone
@@ -29,11 +30,25 @@ import java.util.*
 
 class ListVideoFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragment_list_image) {
 
+    companion object {
+        fun newInstance(isFavorite: Boolean): ListVideoFragment {
+            val args = Bundle()
+            args.putBoolean(IS_FAVORITE, isFavorite)
+
+            val fragment = ListVideoFragment()
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var videoAdapter: VideoAdapter
+    private var isFavorite: Boolean = false
 
     override fun initView() {
         super.initView()
+
+        isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
 
         videoAdapter = VideoAdapter(requireContext())
         binding.rcv.apply {
@@ -97,41 +112,53 @@ class ListVideoFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragme
                 }
             }
             is Resource.Success -> status.data?.let {
-                if (it.isEmpty()) {
-                    binding.rcv.gone()
-                    binding.layoutNoItem.root.visible()
-                    binding.layoutLoading.root.gone()
-                    return
-                }
-
                 lifecycleScope.launch(Dispatchers.IO) {
-                    var result = listOf<BaseVideo>()
+                    val listQuery = arrayListOf<BaseVideo>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_VIDEO, arrayListOf<String>())
+                        it.forEach {
+                            if (listFavorite.contains(it.data)) listQuery.add(it)
+                        }
+                    } else {
+                        listQuery.addAll(it)
+                    }
 
-                    when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
+                    if (listQuery.isEmpty()) {
+                        withContext(Dispatchers.Main) {
+                            binding.rcv.gone()
+                            binding.layoutNoItem.root.visible()
+                            binding.layoutLoading.root.gone()
+                            return@withContext
+                        }
+                        return@launch
+                    }
+
+                    val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
                         SORT_BY_NAME_A_Z -> {
-                            val temp = it.sortedBy { item -> item.displayName?.uppercase() }
-                            result = filterBy(temp, NAME_HEAD)
+                            val temp = listQuery.sortedBy { item -> item.displayName?.uppercase() }
+                            filterBy(temp, NAME_HEAD)
                         }
                         SORT_BY_NAME_Z_A -> {
-                            val temp = it.sortedBy { item -> item.displayName?.uppercase() }.reversed()
-                            result = filterBy(temp, NAME_HEAD)
+                            val temp = listQuery.sortedBy { item -> item.displayName?.uppercase() }.reversed()
+                            filterBy(temp, NAME_HEAD)
                         }
                         SORT_BY_DATE_NEW -> {
-                            val temp = it.sortedBy { item -> item.dateModified }.reversed()
-                            result = filterBy(temp, DATE_HEAD)
+                            val temp = listQuery.sortedBy { item -> item.dateModified }.reversed()
+                            filterBy(temp, DATE_HEAD)
                         }
                         SORT_BY_DATE_OLD -> {
-                            val temp = it.sortedBy { item -> item.dateModified }
-                            result = filterBy(temp, DATE_HEAD)
+                            val temp = listQuery.sortedBy { item -> item.dateModified }
+                            filterBy(temp, DATE_HEAD)
                         }
                         SORT_BY_SIZE_LARGE -> {
-                            val temp = it.sortedBy { item -> item.size }.reversed()
-                            result = filterBy(temp, SIZE_HEAD)
+                            val temp = listQuery.sortedBy { item -> item.size }.reversed()
+                            filterBy(temp, SIZE_HEAD)
                         }
                         SORT_BY_SIZE_SMALL -> {
-                            val temp = it.sortedBy { item -> item.size }
-                            result = filterBy(temp, SIZE_HEAD)
+                            val temp = listQuery.sortedBy { item -> item.size }
+                            filterBy(temp, SIZE_HEAD)
                         }
+                        else -> listOf()
                     }
 
                     withContext(Dispatchers.Main) {

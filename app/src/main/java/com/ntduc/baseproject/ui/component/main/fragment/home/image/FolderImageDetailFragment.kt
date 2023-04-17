@@ -21,11 +21,6 @@ class FolderImageDetailFragment : BaseFragment<FragmentFolderDetailBinding>(R.la
     override fun initView() {
         super.initView()
 
-        if (arguments == null){
-            findNavController().popBackStack()
-            return
-        }
-
         val folderImageFile: FolderImageFile? = requireArguments().getParcelable(KEY_BASE_FOLDER_IMAGE)
 
         if (folderImageFile == null) {

@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FAVORITE_APP
-import com.ntduc.baseproject.constant.SORT_BY
 import com.ntduc.baseproject.data.dto.base.BaseApp
 import com.ntduc.baseproject.databinding.ItemDocumentBinding
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
@@ -65,20 +64,6 @@ class AppAdapter(
 
             binding.executePendingBindings()
         }
-    }
-
-    fun updateItem(baseApp: BaseApp) {
-        var position = -1
-        run breaking@{
-            currentList.indices.forEach {
-                if (currentList[it].packageName == baseApp.packageName) {
-                    position = it
-                    return@breaking
-                }
-            }
-        }
-
-        if (position != -1) notifyItemChanged(position)
     }
 
     companion object {

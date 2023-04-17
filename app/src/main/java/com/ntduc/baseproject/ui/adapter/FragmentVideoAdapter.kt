@@ -8,11 +8,9 @@ import com.ntduc.baseproject.ui.component.main.fragment.home.video.ListVideoFrag
 
 class FragmentVideoAdapter(
     fa: FragmentActivity,
+    isFavorite: Boolean,
 ) : FragmentStateAdapter(fa) {
-    private val listFragment = listOf(
-        ListVideoFragment(),
-        ListFolderVideoFragment()
-    )
+    private val listFragment = listOf(ListVideoFragment.newInstance(isFavorite), ListFolderVideoFragment.newInstance(isFavorite))
 
     override fun createFragment(position: Int): Fragment {
         if (position < listFragment.size) {

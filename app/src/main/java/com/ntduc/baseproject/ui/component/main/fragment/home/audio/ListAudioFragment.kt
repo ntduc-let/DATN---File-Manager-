@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
@@ -25,17 +26,34 @@ import com.ntduc.baseproject.utils.file.share
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class ListAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
 
+    companion object {
+        fun newInstance(isFavorite: Boolean): ListAudioFragment {
+            val args = Bundle()
+            args.putBoolean(IS_FAVORITE, isFavorite)
+
+            val fragment = ListAudioFragment()
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var audioAdapter: AudioAdapter
+    private var isFavorite: Boolean = false
 
     override fun initView() {
         super.initView()
 
-        audioAdapter = AudioAdapter(requireContext())
+        isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
+
+        audioAdapter = AudioAdapter(requireContext(), lifecycleScope)
         binding.rcv.apply {
             adapter = audioAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -166,37 +184,44 @@ class ListAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment
                 }
             }
             is Resource.Success -> status.data?.let {
-                if (it.isEmpty()) {
-                    binding.rcv.gone()
-                    binding.layoutNoItem.root.visible()
-                    binding.layoutLoading.root.gone()
-                    return
-                }
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val listQuery = arrayListOf<BaseAudio>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_AUDIO, arrayListOf<String>())
+                        it.forEach {
+                            if (listFavorite.contains(it.data)) listQuery.add(it)
+                        }
+                    } else {
+                        listQuery.addAll(it)
+                    }
 
-                when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
-                    SORT_BY_NAME_A_Z -> {
-                        audioAdapter.submitList(it.sortedBy { item -> item.displayName })
+                    if (listQuery.isEmpty()) {
+                        withContext(Dispatchers.Main) {
+                            binding.rcv.gone()
+                            binding.layoutNoItem.root.visible()
+                            binding.layoutLoading.root.gone()
+                            return@withContext
+                        }
+                        return@launch
                     }
-                    SORT_BY_NAME_Z_A -> {
-                        audioAdapter.submitList(it.sortedBy { item -> item.displayName }.reversed())
+
+                    val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
+                        SORT_BY_NAME_A_Z -> listQuery.sortedBy { item -> item.displayName?.uppercase() }
+                        SORT_BY_NAME_Z_A -> listQuery.sortedBy { item -> item.displayName?.uppercase() }.reversed()
+                        SORT_BY_DATE_NEW -> listQuery.sortedBy { item -> item.dateModified }.reversed()
+                        SORT_BY_DATE_OLD -> listQuery.sortedBy { item -> item.dateModified }
+                        SORT_BY_SIZE_LARGE -> listQuery.sortedBy { item -> item.size }.reversed()
+                        SORT_BY_SIZE_SMALL -> listQuery.sortedBy { item -> item.size }
+                        else -> listOf()
                     }
-                    SORT_BY_DATE_NEW -> {
-                        audioAdapter.submitList(it.sortedBy { item -> item.dateModified }.reversed())
-                    }
-                    SORT_BY_DATE_OLD -> {
-                        audioAdapter.submitList(it.sortedBy { item -> item.dateModified })
-                    }
-                    SORT_BY_SIZE_LARGE -> {
-                        audioAdapter.submitList(it.sortedBy { item -> item.size }.reversed())
-                    }
-                    SORT_BY_SIZE_SMALL -> {
-                        audioAdapter.submitList(it.sortedBy { item -> item.size })
+
+                    withContext(Dispatchers.Main) {
+                        audioAdapter.submitList(result)
+                        binding.rcv.visible()
+                        binding.layoutNoItem.root.gone()
+                        binding.layoutLoading.root.gone()
                     }
                 }
-
-                binding.rcv.visible()
-                binding.layoutNoItem.root.gone()
-                binding.layoutLoading.root.gone()
             }
             is Resource.DataError -> {
                 binding.rcv.gone()

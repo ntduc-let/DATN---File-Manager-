@@ -11,6 +11,7 @@ import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseImage
+import com.ntduc.baseproject.data.dto.base.BaseVideo
 import com.ntduc.baseproject.data.dto.folder.FolderImageFile
 import com.ntduc.baseproject.databinding.FragmentListImageInFolderBinding
 import com.ntduc.baseproject.databinding.MenuDocumentDetailBinding
@@ -43,16 +44,13 @@ class ListImageInFolderFragment : BaseFragment<FragmentListImageInFolderBinding>
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var imageAdapter: ImageAdapter
     private var folderImageFile: FolderImageFile? = null
+    private var isFavorite: Boolean = false
 
     override fun initView() {
         super.initView()
 
-        if (arguments == null) {
-            findNavController().popBackStack()
-            return
-        }
-
         folderImageFile = requireArguments().getParcelable(KEY_BASE_FOLDER_IMAGE)
+        isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
 
         if (folderImageFile == null) {
             findNavController().popBackStack()
@@ -110,7 +108,17 @@ class ListImageInFolderFragment : BaseFragment<FragmentListImageInFolderBinding>
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val list = it.filter { File(it.data!!).parent == folderImageFile!!.baseFile!!.data }
+                    val listQuery = arrayListOf<BaseImage>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_IMAGE, arrayListOf<String>())
+                        it.forEach {
+                            if (listFavorite.contains(it.data)) listQuery.add(it)
+                        }
+                    } else {
+                        listQuery.addAll(it)
+                    }
+
+                    val list = listQuery.filter { File(it.data!!).parent == folderImageFile!!.baseFile!!.data }
 
                     withContext(Dispatchers.Main) {
                         if (list.isEmpty()) {
@@ -121,33 +129,32 @@ class ListImageInFolderFragment : BaseFragment<FragmentListImageInFolderBinding>
                         }
 
                         withContext(Dispatchers.IO) {
-                            var result = listOf<BaseImage>()
-
-                            when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
+                            val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
                                 SORT_BY_NAME_A_Z -> {
                                     val temp = list.sortedBy { item -> item.displayName?.uppercase() }
-                                    result = filterBy(temp, NAME_HEAD)
+                                    filterBy(temp, NAME_HEAD)
                                 }
                                 SORT_BY_NAME_Z_A -> {
                                     val temp = list.sortedBy { item -> item.displayName?.uppercase() }.reversed()
-                                    result = filterBy(temp, NAME_HEAD)
+                                    filterBy(temp, NAME_HEAD)
                                 }
                                 SORT_BY_DATE_NEW -> {
                                     val temp = list.sortedBy { item -> item.dateModified }.reversed()
-                                    result = filterBy(temp, DATE_HEAD)
+                                    filterBy(temp, DATE_HEAD)
                                 }
                                 SORT_BY_DATE_OLD -> {
                                     val temp = list.sortedBy { item -> item.dateModified }
-                                    result = filterBy(temp, DATE_HEAD)
+                                    filterBy(temp, DATE_HEAD)
                                 }
                                 SORT_BY_SIZE_LARGE -> {
                                     val temp = list.sortedBy { item -> item.size }.reversed()
-                                    result = filterBy(temp, SIZE_HEAD)
+                                    filterBy(temp, SIZE_HEAD)
                                 }
                                 SORT_BY_SIZE_SMALL -> {
                                     val temp = list.sortedBy { item -> item.size }
-                                    result = filterBy(temp, SIZE_HEAD)
+                                    filterBy(temp, SIZE_HEAD)
                                 }
+                                else -> listOf()
                             }
 
                             withContext(Dispatchers.Main) {

@@ -8,8 +8,9 @@ import com.ntduc.baseproject.ui.component.main.fragment.home.app.ListAppFragment
 
 class FragmentAppAdapter(
     fa: FragmentActivity,
+    isFavorite: Boolean,
 ) : FragmentStateAdapter(fa) {
-    private val listFragment = listOf(ListAppFragment(), ListApkFragment())
+    private val listFragment = listOf(ListAppFragment.newInstance(isFavorite), ListApkFragment.newInstance(isFavorite))
 
     override fun createFragment(position: Int): Fragment {
         if (position < listFragment.size) {

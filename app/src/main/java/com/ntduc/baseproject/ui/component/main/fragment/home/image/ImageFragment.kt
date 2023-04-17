@@ -4,6 +4,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
 import com.ntduc.baseproject.R
+import com.ntduc.baseproject.constant.IS_FAVORITE
 import com.ntduc.baseproject.databinding.FragmentImageBinding
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
@@ -22,7 +23,10 @@ class ImageFragment : BaseFragment<FragmentImageBinding>(R.layout.fragment_image
     override fun initView() {
         super.initView()
 
-        fragmentImageAdapter = FragmentImageAdapter(requireActivity())
+        val isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
+        if (isFavorite) binding.title.text = "${getString(R.string.favorite)} ${getString(R.string.images)}"
+
+        fragmentImageAdapter = FragmentImageAdapter(requireActivity(), isFavorite)
         binding.vp.adapter = fragmentImageAdapter
 
         TabLayoutMediator(binding.tab, binding.vp) { tab, position ->

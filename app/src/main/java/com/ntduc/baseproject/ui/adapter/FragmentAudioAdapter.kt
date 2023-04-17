@@ -6,15 +6,15 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.ntduc.baseproject.ui.component.main.fragment.home.audio.ListAudioFragment
 import com.ntduc.baseproject.ui.component.main.fragment.home.audio.ListFolderAudioFragment
 import com.ntduc.baseproject.ui.component.main.fragment.home.audio.PlaylistAudioFragment
-import com.ntduc.baseproject.ui.component.main.fragment.home.document.ListDocumentFragment
 
 class FragmentAudioAdapter(
     fa: FragmentActivity,
+    isFavorite: Boolean,
 ) : FragmentStateAdapter(fa) {
     private val listFragment = listOf(
-        ListAudioFragment(),
-        ListFolderAudioFragment(),
-        PlaylistAudioFragment()
+        ListAudioFragment.newInstance(isFavorite),
+        ListFolderAudioFragment.newInstance(isFavorite),
+//        PlaylistAudioFragment()
     )
 
     override fun createFragment(position: Int): Fragment {

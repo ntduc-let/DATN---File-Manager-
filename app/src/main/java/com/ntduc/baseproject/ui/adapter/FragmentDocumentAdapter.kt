@@ -7,14 +7,15 @@ import com.ntduc.baseproject.ui.component.main.fragment.home.document.ListDocume
 
 class FragmentDocumentAdapter(
     fa: FragmentActivity,
+    isFavorite: Boolean,
 ) : FragmentStateAdapter(fa) {
     private val listFragment = listOf(
-        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_ALL),
-        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_PDF),
-        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_TXT),
-        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_DOC),
-        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_XLS),
-        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_PPT)
+        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_ALL, isFavorite),
+        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_PDF, isFavorite),
+        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_TXT, isFavorite),
+        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_DOC, isFavorite),
+        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_XLS, isFavorite),
+        ListDocumentFragment.newInstance(ListDocumentFragment.TYPE_PPT, isFavorite)
     )
 
     override fun createFragment(position: Int): Fragment {

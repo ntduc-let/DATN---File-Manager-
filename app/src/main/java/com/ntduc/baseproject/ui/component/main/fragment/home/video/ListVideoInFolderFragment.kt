@@ -18,6 +18,7 @@ import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.ui.component.main.dialog.VideoMoreDialog
 import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
+import com.ntduc.baseproject.ui.component.main.fragment.home.app.AppFragment
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.file.open
@@ -36,16 +37,13 @@ class ListVideoInFolderFragment : BaseFragment<FragmentListVideoInFolderBinding>
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var videoAdapter: VideoAdapter
     private var folderVideoFile: FolderVideoFile? = null
+    private var isFavorite: Boolean = false
 
     override fun initView() {
         super.initView()
 
-        if (arguments == null) {
-            findNavController().popBackStack()
-            return
-        }
-
         folderVideoFile = requireArguments().getParcelable(KEY_BASE_FOLDER_VIDEO)
+        isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
 
         if (folderVideoFile == null) {
             findNavController().popBackStack()
@@ -103,7 +101,17 @@ class ListVideoInFolderFragment : BaseFragment<FragmentListVideoInFolderBinding>
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val list = it.filter { File(it.data!!).parent == folderVideoFile!!.baseFile!!.data }
+                    val listQuery = arrayListOf<BaseVideo>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_VIDEO, arrayListOf<String>())
+                        it.forEach {
+                            if (listFavorite.contains(it.data)) listQuery.add(it)
+                        }
+                    } else {
+                        listQuery.addAll(it)
+                    }
+
+                    val list = listQuery.filter { File(it.data!!).parent == folderVideoFile!!.baseFile!!.data }
 
                     withContext(Dispatchers.Main) {
                         if (list.isEmpty()) {

@@ -34,11 +34,25 @@ import java.io.File
 
 class ListFolderVideoFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
 
+    companion object {
+        fun newInstance(isFavorite: Boolean): ListFolderVideoFragment {
+            val args = Bundle()
+            args.putBoolean(IS_FAVORITE, isFavorite)
+
+            val fragment = ListFolderVideoFragment()
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var folderVideoAdapter: FolderVideoAdapter
+    private var isFavorite: Boolean = false
 
     override fun initView() {
         super.initView()
+
+        isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
 
         folderVideoAdapter = FolderVideoAdapter(requireContext())
         binding.rcv.apply {
@@ -53,6 +67,7 @@ class ListFolderVideoFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
         folderVideoAdapter.setOnOpenListener {
             val bundle = Bundle()
             bundle.putParcelable(KEY_BASE_FOLDER_VIDEO, it)
+            bundle.putBoolean(IS_FAVORITE, isFavorite)
             navigateToDes(R.id.listVideoInFolderFragment, bundle)
         }
 
@@ -110,36 +125,39 @@ class ListFolderVideoFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val result = filterFolderFile(it)
+                    val listQuery = arrayListOf<BaseVideo>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_VIDEO, arrayListOf<String>())
+                        it.forEach {
+                            if (listFavorite.contains(it.data)) listQuery.add(it)
+                        }
+                    } else {
+                        listQuery.addAll(it)
+                    }
 
-                    withContext(Dispatchers.Main) {
-                        if (result.isEmpty()) {
+                    val temp = filterFolderFile(listQuery)
+                    if (temp.isEmpty()) {
+                        withContext(Dispatchers.Main) {
                             binding.rcv.gone()
                             binding.layoutNoItem.root.visible()
                             binding.layoutLoading.root.gone()
                             return@withContext
                         }
-                        when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
-                            SORT_BY_NAME_A_Z -> {
-                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.displayName })
-                            }
-                            SORT_BY_NAME_Z_A -> {
-                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.displayName }.reversed())
-                            }
-                            SORT_BY_DATE_NEW -> {
-                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.dateModified }.reversed())
-                            }
-                            SORT_BY_DATE_OLD -> {
-                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.dateModified })
-                            }
-                            SORT_BY_SIZE_LARGE -> {
-                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.size }.reversed())
-                            }
-                            SORT_BY_SIZE_SMALL -> {
-                                folderVideoAdapter.submitList(result.sortedBy { item -> item.baseFile!!.size })
-                            }
-                        }
+                        return@launch
+                    }
 
+                    val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
+                        SORT_BY_NAME_A_Z -> temp.sortedBy { item -> item.baseFile!!.displayName?.uppercase() }
+                        SORT_BY_NAME_Z_A -> temp.sortedBy { item -> item.baseFile!!.displayName?.uppercase() }.reversed()
+                        SORT_BY_DATE_NEW -> temp.sortedBy { item -> item.baseFile!!.dateModified }.reversed()
+                        SORT_BY_DATE_OLD -> temp.sortedBy { item -> item.baseFile!!.dateModified }
+                        SORT_BY_SIZE_LARGE -> temp.sortedBy { item -> item.baseFile!!.size }.reversed()
+                        SORT_BY_SIZE_SMALL -> temp.sortedBy { item -> item.baseFile!!.size }
+                        else -> listOf()
+                    }
+
+                    withContext(Dispatchers.Main){
+                        folderVideoAdapter.submitList(result)
                         binding.rcv.visible()
                         binding.layoutNoItem.root.gone()
                         binding.layoutLoading.root.gone()

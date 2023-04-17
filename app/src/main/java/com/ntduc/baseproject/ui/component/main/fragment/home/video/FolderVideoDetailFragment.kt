@@ -21,11 +21,6 @@ class FolderVideoDetailFragment : BaseFragment<FragmentFolderDetailBinding>(R.la
     override fun initView() {
         super.initView()
 
-        if (arguments == null) {
-            findNavController().popBackStack()
-            return
-        }
-
         val folderVideoFile: FolderVideoFile? = requireArguments().getParcelable(KEY_BASE_FOLDER_VIDEO)
 
         if (folderVideoFile == null) {

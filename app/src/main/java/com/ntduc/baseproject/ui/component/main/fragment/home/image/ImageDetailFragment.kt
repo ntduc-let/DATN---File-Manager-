@@ -24,11 +24,6 @@ class ImageDetailFragment : BaseFragment<FragmentImageDetailBinding>(R.layout.fr
     override fun initView() {
         super.initView()
 
-        if (arguments == null) {
-            findNavController().popBackStack()
-            return
-        }
-
         val baseImage: BaseImage? = requireArguments().getParcelable(KEY_BASE_IMAGE)
 
         if (baseImage == null) {

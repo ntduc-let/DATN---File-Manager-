@@ -8,11 +8,9 @@ import com.ntduc.baseproject.ui.component.main.fragment.home.image.ListImageFrag
 
 class FragmentImageAdapter(
     fa: FragmentActivity,
+    isFavorite: Boolean,
 ) : FragmentStateAdapter(fa) {
-    private val listFragment = listOf(
-        ListImageFragment(),
-        ListFolderImageFragment()
-    )
+    private val listFragment = listOf(ListImageFragment.newInstance(isFavorite), ListFolderImageFragment.newInstance(isFavorite))
 
     override fun createFragment(position: Int): Fragment {
         if (position < listFragment.size) {

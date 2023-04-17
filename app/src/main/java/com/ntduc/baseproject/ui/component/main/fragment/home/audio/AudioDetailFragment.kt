@@ -26,11 +26,6 @@ class AudioDetailFragment : BaseFragment<FragmentAudioDetailBinding>(R.layout.fr
     override fun initView() {
         super.initView()
 
-        if (arguments == null){
-            findNavController().popBackStack()
-            return
-        }
-
         val baseAudio: BaseAudio? = requireArguments().getParcelable(KEY_BASE_AUDIO)
 
         if (baseAudio == null) {

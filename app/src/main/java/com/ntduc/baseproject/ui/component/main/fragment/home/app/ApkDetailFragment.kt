@@ -25,11 +25,6 @@ class ApkDetailFragment : BaseFragment<FragmentApkDetailBinding>(R.layout.fragme
     override fun initView() {
         super.initView()
 
-        if (arguments == null){
-            findNavController().popBackStack()
-            return
-        }
-
         val baseApk: BaseApk? = requireArguments().getParcelable(KEY_BASE_APK)
 
         if (baseApk == null) {

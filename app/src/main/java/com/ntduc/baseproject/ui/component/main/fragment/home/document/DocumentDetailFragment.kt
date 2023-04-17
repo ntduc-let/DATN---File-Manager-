@@ -23,11 +23,6 @@ class DocumentDetailFragment : BaseFragment<FragmentApkDetailBinding>(R.layout.f
     override fun initView() {
         super.initView()
 
-        if (arguments == null){
-            findNavController().popBackStack()
-            return
-        }
-
         val baseFile: BaseFile? = requireArguments().getParcelable(KEY_BASE_DOCUMENT)
 
         if (baseFile == null) {

@@ -4,34 +4,56 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseApk
-import com.ntduc.baseproject.data.dto.base.BaseApp
 import com.ntduc.baseproject.databinding.FragmentListAppBinding
 import com.ntduc.baseproject.databinding.MenuApkDetailBinding
 import com.ntduc.baseproject.ui.adapter.ApkAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.BasePopupWindow
-import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.activity.getStatusBarHeight
 import com.ntduc.baseproject.utils.context.displayHeight
+import com.ntduc.baseproject.utils.dp
 import com.ntduc.baseproject.utils.file.delete
+import com.ntduc.baseproject.utils.installApk
+import com.ntduc.baseproject.utils.navigateToDes
+import com.ntduc.baseproject.utils.observe
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class ListApkFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
 
+    companion object {
+
+        fun newInstance(isFavorite: Boolean): ListApkFragment {
+            val args = Bundle()
+            args.putBoolean(IS_FAVORITE, isFavorite)
+
+            val fragment = ListApkFragment()
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var apkAdapter: ApkAdapter
+    private var isFavorite: Boolean = false
 
     override fun initView() {
         super.initView()
+
+        isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
 
         apkAdapter = ApkAdapter(requireContext())
         binding.rcv.apply {
@@ -75,18 +97,17 @@ class ListApkFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
 
         popupBinding.delete.setOnClickListener {
             File(baseApk.data!!).delete(requireContext())
-            apkAdapter.removeItem(baseApk)
+            viewModel.requestAllApk()
             popupWindow.dismiss()
         }
 
         popupBinding.favorite.setOnClickListener {
             if (isFavorite) {
                 removeFavorite(baseApk)
-                apkAdapter.updateItem(baseApk)
             } else {
                 addFavorite(baseApk)
-                apkAdapter.updateItem(baseApk)
             }
+            viewModel.requestAllApk()
             popupWindow.dismiss()
         }
 
@@ -150,37 +171,42 @@ class ListApkFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
                 }
             }
             is Resource.Success -> status.data?.let {
-                if (it.isEmpty()) {
-                    binding.rcv.gone()
-                    binding.layoutNoItem.root.visible()
-                    binding.layoutLoading.root.gone()
-                    return
-                }
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val listQuery = arrayListOf<BaseApk>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_APK, arrayListOf<String>())
+                        it.forEach {
+                            if (listFavorite.contains(it.data)) listQuery.add(it)
+                        }
+                    } else {
+                        listQuery.addAll(it)
+                    }
 
-                when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
-                    SORT_BY_NAME_A_Z -> {
-                        apkAdapter.submitList(it.sortedBy { item -> item.displayName })
+                    if (listQuery.isEmpty()) {
+                        withContext(Dispatchers.Main) {
+                            binding.rcv.gone()
+                            binding.layoutNoItem.root.visible()
+                            binding.layoutLoading.root.gone()
+                            return@withContext
+                        }
+                        return@launch
                     }
-                    SORT_BY_NAME_Z_A -> {
-                        apkAdapter.submitList(it.sortedBy { item -> item.displayName }.reversed())
+                    val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
+                        SORT_BY_NAME_A_Z -> listQuery.sortedBy { item -> item.displayName?.uppercase() }
+                        SORT_BY_NAME_Z_A -> listQuery.sortedBy { item -> item.displayName?.uppercase() }.reversed()
+                        SORT_BY_DATE_NEW -> listQuery.sortedBy { item -> item.dateModified }.reversed()
+                        SORT_BY_DATE_OLD -> listQuery.sortedBy { item -> item.dateModified }
+                        SORT_BY_SIZE_LARGE -> listQuery.sortedBy { item -> item.size }.reversed()
+                        SORT_BY_SIZE_SMALL -> listQuery.sortedBy { item -> item.size }
+                        else -> listOf()
                     }
-                    SORT_BY_DATE_NEW -> {
-                        apkAdapter.submitList(it.sortedBy { item -> item.dateModified }.reversed())
-                    }
-                    SORT_BY_DATE_OLD -> {
-                        apkAdapter.submitList(it.sortedBy { item -> item.dateModified })
-                    }
-                    SORT_BY_SIZE_LARGE -> {
-                        apkAdapter.submitList(it.sortedBy { item -> item.size }.reversed())
-                    }
-                    SORT_BY_SIZE_SMALL -> {
-                        apkAdapter.submitList(it.sortedBy { item -> item.size })
+                    withContext(Dispatchers.Main) {
+                        apkAdapter.submitList(result)
+                        binding.rcv.visible()
+                        binding.layoutNoItem.root.gone()
+                        binding.layoutLoading.root.gone()
                     }
                 }
-
-                binding.rcv.visible()
-                binding.layoutNoItem.root.gone()
-                binding.layoutLoading.root.gone()
             }
             is Resource.DataError -> {
                 binding.rcv.gone()

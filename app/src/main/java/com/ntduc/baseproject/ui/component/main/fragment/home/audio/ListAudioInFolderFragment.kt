@@ -12,7 +12,6 @@ import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseAudio
 import com.ntduc.baseproject.data.dto.folder.FolderAudioFile
-import com.ntduc.baseproject.databinding.FragmentListAppBinding
 import com.ntduc.baseproject.databinding.FragmentListAudioInFolderBinding
 import com.ntduc.baseproject.databinding.MenuDocumentDetailBinding
 import com.ntduc.baseproject.ui.adapter.AudioAdapter
@@ -21,13 +20,15 @@ import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.BasePopupWindow
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
-import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.activity.getStatusBarHeight
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.context.displayHeight
+import com.ntduc.baseproject.utils.dp
 import com.ntduc.baseproject.utils.file.delete
 import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.file.share
+import com.ntduc.baseproject.utils.navigateToDes
+import com.ntduc.baseproject.utils.observe
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
@@ -41,16 +42,13 @@ class ListAudioInFolderFragment : BaseFragment<FragmentListAudioInFolderBinding>
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var audioAdapter: AudioAdapter
     private var folderAudioFile: FolderAudioFile? = null
+    private var isFavorite: Boolean = false
 
     override fun initView() {
         super.initView()
 
-        if (arguments == null) {
-            findNavController().popBackStack()
-            return
-        }
-
         folderAudioFile = requireArguments().getParcelable(KEY_BASE_FOLDER_AUDIO)
+        isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
 
         if (folderAudioFile == null) {
             findNavController().popBackStack()
@@ -59,7 +57,7 @@ class ListAudioInFolderFragment : BaseFragment<FragmentListAudioInFolderBinding>
 
         binding.title.text = folderAudioFile!!.baseFile!!.displayName
 
-        audioAdapter = AudioAdapter(requireContext())
+        audioAdapter = AudioAdapter(requireContext(), lifecycleScope)
         binding.rcv.apply {
             adapter = audioAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -103,37 +101,39 @@ class ListAudioInFolderFragment : BaseFragment<FragmentListAudioInFolderBinding>
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val list = it.filter { File(it.data!!).parent == folderAudioFile!!.baseFile!!.data }
+                    val listQuery = arrayListOf<BaseAudio>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_AUDIO, arrayListOf<String>())
+                        it.forEach {
+                            if (listFavorite.contains(it.data)) listQuery.add(it)
+                        }
+                    } else {
+                        listQuery.addAll(it)
+                    }
 
-                    withContext(Dispatchers.Main) {
-                        if (list.isEmpty()) {
+                    val list = listQuery.filter { File(it.data!!).parent == folderAudioFile!!.baseFile!!.data }
+
+                    if (list.isEmpty()) {
+                        withContext(Dispatchers.Main) {
                             binding.rcv.gone()
                             binding.layoutNoItem.root.visible()
                             binding.layoutLoading.root.gone()
                             return@withContext
                         }
+                        return@launch
+                    }
+                    val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
+                        SORT_BY_NAME_A_Z -> list.sortedBy { item -> item.displayName?.uppercase() }
+                        SORT_BY_NAME_Z_A -> list.sortedBy { item -> item.displayName?.uppercase() }.reversed()
+                        SORT_BY_DATE_NEW -> list.sortedBy { item -> item.dateModified }.reversed()
+                        SORT_BY_DATE_OLD -> list.sortedBy { item -> item.dateModified }
+                        SORT_BY_SIZE_LARGE -> list.sortedBy { item -> item.size }.reversed()
+                        SORT_BY_SIZE_SMALL -> list.sortedBy { item -> item.size }
+                        else -> listOf()
+                    }
 
-                        when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
-                            SORT_BY_NAME_A_Z -> {
-                                audioAdapter.submitList(list.sortedBy { item -> item.displayName })
-                            }
-                            SORT_BY_NAME_Z_A -> {
-                                audioAdapter.submitList(list.sortedBy { item -> item.displayName }.reversed())
-                            }
-                            SORT_BY_DATE_NEW -> {
-                                audioAdapter.submitList(list.sortedBy { item -> item.dateModified }.reversed())
-                            }
-                            SORT_BY_DATE_OLD -> {
-                                audioAdapter.submitList(list.sortedBy { item -> item.dateModified })
-                            }
-                            SORT_BY_SIZE_LARGE -> {
-                                audioAdapter.submitList(list.sortedBy { item -> item.size }.reversed())
-                            }
-                            SORT_BY_SIZE_SMALL -> {
-                                audioAdapter.submitList(list.sortedBy { item -> item.size })
-                            }
-                        }
-
+                    withContext(Dispatchers.Main) {
+                        audioAdapter.submitList(result)
                         binding.rcv.visible()
                         binding.layoutNoItem.root.gone()
                         binding.layoutLoading.root.gone()

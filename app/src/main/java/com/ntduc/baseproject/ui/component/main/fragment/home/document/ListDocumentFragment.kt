@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.data.dto.base.BaseVideo
 import com.ntduc.baseproject.databinding.FragmentListAppBinding
 import com.ntduc.baseproject.databinding.MenuDocumentDetailBinding
 import com.ntduc.baseproject.ui.adapter.DocumentAdapter
@@ -26,6 +28,9 @@ import com.ntduc.baseproject.utils.file.share
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
@@ -33,6 +38,7 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var documentAdapter: DocumentAdapter
     private var type = TYPE_ALL
+    private var isFavorite: Boolean = false
 
     companion object {
         private const val TYPE = "TYPE"
@@ -44,9 +50,10 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
         const val TYPE_XLS = 5
         const val TYPE_PPT = 6
 
-        fun newInstance(type: Int): ListDocumentFragment {
+        fun newInstance(type: Int, isFavorite: Boolean): ListDocumentFragment {
             val args = Bundle()
             args.putInt(TYPE, type)
+            args.putBoolean(IS_FAVORITE, isFavorite)
 
             val fragment = ListDocumentFragment()
             fragment.arguments = args
@@ -57,12 +64,8 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
     override fun initView() {
         super.initView()
 
-        if (arguments == null) {
-            findNavController().popBackStack()
-            return
-        }
-
         type = requireArguments().getInt(TYPE, TYPE_ALL)
+        isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
 
         documentAdapter = DocumentAdapter(requireContext())
         binding.rcv.apply {
@@ -195,61 +198,54 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
                 }
             }
             is Resource.Success -> status.data?.let {
-                val list: List<BaseFile> = when (type) {
-                    TYPE_ALL -> {
-                        it
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val listQuery = arrayListOf<BaseFile>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_DOCUMENT, arrayListOf<String>())
+                        it.forEach {
+                            if (listFavorite.contains(it.data)) listQuery.add(it)
+                        }
+                    } else {
+                        listQuery.addAll(it)
                     }
-                    TYPE_PDF -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PDF }
+
+                    val list: List<BaseFile> = when (type) {
+                        TYPE_ALL -> listQuery
+                        TYPE_PDF -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PDF }
+                        TYPE_TXT -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.TXT }
+                        TYPE_DOC -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.DOC }
+                        TYPE_XLS -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.XLS }
+                        TYPE_PPT -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PPT }
+                        else -> listQuery
                     }
-                    TYPE_TXT -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.TXT }
+
+                    if (list.isEmpty()) {
+                        withContext(Dispatchers.Main) {
+                            binding.rcv.gone()
+                            binding.layoutNoItem.root.visible()
+                            binding.layoutLoading.root.gone()
+                            return@withContext
+                        }
+                        return@launch
                     }
-                    TYPE_DOC -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.DOC }
+
+                    val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
+                        SORT_BY_NAME_A_Z -> list.sortedBy { item -> item.displayName?.uppercase() }
+                        SORT_BY_NAME_Z_A -> list.sortedBy { item -> item.displayName?.uppercase() }.reversed()
+                        SORT_BY_DATE_NEW -> list.sortedBy { item -> item.dateModified }.reversed()
+                        SORT_BY_DATE_OLD -> list.sortedBy { item -> item.dateModified }
+                        SORT_BY_SIZE_LARGE -> list.sortedBy { item -> item.size }.reversed()
+                        SORT_BY_SIZE_SMALL -> list.sortedBy { item -> item.size }
+                        else -> listOf()
                     }
-                    TYPE_XLS -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.XLS }
-                    }
-                    TYPE_PPT -> {
-                        it.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PPT }
-                    }
-                    else -> {
-                        it
+
+                    withContext(Dispatchers.Main) {
+                        documentAdapter.submitList(result)
+                        binding.rcv.visible()
+                        binding.layoutNoItem.root.gone()
+                        binding.layoutLoading.root.gone()
                     }
                 }
-
-                if (list.isEmpty()) {
-                    binding.rcv.gone()
-                    binding.layoutNoItem.root.visible()
-                    binding.layoutLoading.root.gone()
-                    return
-                }
-
-                when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
-                    SORT_BY_NAME_A_Z -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.displayName })
-                    }
-                    SORT_BY_NAME_Z_A -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.displayName }.reversed())
-                    }
-                    SORT_BY_DATE_NEW -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.dateModified }.reversed())
-                    }
-                    SORT_BY_DATE_OLD -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.dateModified })
-                    }
-                    SORT_BY_SIZE_LARGE -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.size }.reversed())
-                    }
-                    SORT_BY_SIZE_SMALL -> {
-                        documentAdapter.submitList(list.sortedBy { item -> item.size })
-                    }
-                }
-
-                binding.rcv.visible()
-                binding.layoutNoItem.root.gone()
-                binding.layoutLoading.root.gone()
             }
             is Resource.DataError -> {
                 binding.rcv.gone()

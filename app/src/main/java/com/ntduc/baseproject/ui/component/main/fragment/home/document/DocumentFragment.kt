@@ -4,6 +4,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
 import com.ntduc.baseproject.R
+import com.ntduc.baseproject.constant.IS_FAVORITE
 import com.ntduc.baseproject.databinding.FragmentAppBinding
 import com.ntduc.baseproject.databinding.FragmentDocumentBinding
 import com.ntduc.baseproject.ui.base.BaseFragment
@@ -23,7 +24,10 @@ class DocumentFragment : BaseFragment<FragmentDocumentBinding>(R.layout.fragment
     override fun initView() {
         super.initView()
 
-        fragmentDocumentAdapter = FragmentDocumentAdapter(requireActivity())
+        val isFavorite = requireArguments().getBoolean(IS_FAVORITE, false)
+        if (isFavorite) binding.title.text = "${getString(R.string.favorite)} ${getString(R.string.document)}"
+
+        fragmentDocumentAdapter = FragmentDocumentAdapter(requireActivity(), isFavorite)
         binding.vp.adapter = fragmentDocumentAdapter
 
         TabLayoutMediator(binding.tab, binding.vp) { tab, position ->

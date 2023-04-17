@@ -24,11 +24,6 @@ class VideoDetailFragment : BaseFragment<FragmentVideoDetailBinding>(R.layout.fr
     override fun initView() {
         super.initView()
 
-        if (arguments == null) {
-            findNavController().popBackStack()
-            return
-        }
-
         val baseVideo: BaseVideo? = requireArguments().getParcelable(KEY_BASE_VIDEO)
 
         if (baseVideo == null) {

@@ -22,11 +22,6 @@ class FolderAudioDetailFragment : BaseFragment<FragmentFolderDetailBinding>(R.la
     override fun initView() {
         super.initView()
 
-        if (arguments == null){
-            findNavController().popBackStack()
-            return
-        }
-
         val folderAudioFile: FolderAudioFile? = requireArguments().getParcelable(KEY_BASE_FOLDER_AUDIO)
 
         if (folderAudioFile == null) {
