@@ -78,11 +78,28 @@ class ListAudioInFolderFragment : BaseFragment<FragmentListAudioInFolderBinding>
 
         audioAdapter.setOnOpenListener {
             File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            updateRecent(it)
         }
 
         audioAdapter.setOnMoreListener { view, baseFile ->
             showMenu(view, baseFile)
         }
+    }
+
+    private fun updateRecent(baseAudio: BaseAudio) {
+        val recent = Hawk.get(RECENT_FILE, arrayListOf<String>())
+
+        val newRecent = arrayListOf<String>()
+        newRecent.addAll(recent)
+
+        recent.forEach {
+            if (it == baseAudio.data) newRecent.remove(it)
+        }
+
+        newRecent.add(0, baseAudio.data!!)
+
+        Hawk.put(RECENT_FILE, newRecent)
+        viewModel.requestAllRecent()
     }
 
     override fun addObservers() {

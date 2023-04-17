@@ -5,13 +5,11 @@ import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseFile
-import com.ntduc.baseproject.data.dto.base.BaseVideo
 import com.ntduc.baseproject.databinding.FragmentListAppBinding
 import com.ntduc.baseproject.databinding.MenuDocumentDetailBinding
 import com.ntduc.baseproject.ui.adapter.DocumentAdapter
@@ -79,11 +77,28 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
 
         documentAdapter.setOnOpenListener {
             File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            updateRecent(it)
         }
 
         documentAdapter.setOnMoreListener { view, baseFile ->
             showMenu(view, baseFile)
         }
+    }
+
+    private fun updateRecent(baseFile: BaseFile) {
+        val recent = Hawk.get(RECENT_FILE, arrayListOf<String>())
+
+        val newRecent = arrayListOf<String>()
+        newRecent.addAll(recent)
+
+        recent.forEach {
+            if (it == baseFile.data) newRecent.remove(it)
+        }
+
+        newRecent.add(0, baseFile.data!!)
+
+        Hawk.put(RECENT_FILE, newRecent)
+        viewModel.requestAllRecent()
     }
 
     private fun showMenu(view: View, baseFile: BaseFile) {

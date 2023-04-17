@@ -2,10 +2,7 @@ package com.ntduc.baseproject.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.ntduc.baseproject.constant.FAVOURITES_KEY
-import com.ntduc.baseproject.constant.FileType
-import com.ntduc.baseproject.constant.PLAYLIST_AUDIO
-import com.ntduc.baseproject.constant.SHARED_PREFERENCES_FILE_NAME
+import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.*
 import com.ntduc.baseproject.data.dto.login.LoginRequest
@@ -74,6 +71,25 @@ class LocalData @Inject constructor(val context: Context) {
         editor.apply()
         val isSuccess = editor.commit()
         return Resource.Success(isSuccess)
+    }
+
+    fun requestAllRecent(): Resource<List<BaseFile>> {
+        val result = arrayListOf<BaseFile>()
+
+        val listRecent = Hawk.get(RECENT_FILE, listOf<String>())
+        val baseFileList = context.getFiles()
+        listRecent.forEach {path ->
+            run forE@{
+                baseFileList.forEach {
+                    if (it.data == path) {
+                        result.add(it)
+                        return@forE
+                    }
+                }
+            }
+        }
+
+        return Resource.Success(result)
     }
 
     fun requestAllApk(): Resource<List<BaseApk>> {

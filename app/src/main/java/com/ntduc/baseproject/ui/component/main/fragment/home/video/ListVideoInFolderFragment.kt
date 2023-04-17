@@ -18,7 +18,6 @@ import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.ui.component.main.dialog.VideoMoreDialog
 import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
-import com.ntduc.baseproject.ui.component.main.fragment.home.app.AppFragment
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.file.open
@@ -78,11 +77,28 @@ class ListVideoInFolderFragment : BaseFragment<FragmentListVideoInFolderBinding>
 
         videoAdapter.setOnOpenListener {
             File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            updateRecent(it)
         }
 
         videoAdapter.setOnMoreListener { view, baseVideo ->
             showMenu(view, baseVideo)
         }
+    }
+
+    private fun updateRecent(baseVideo: BaseVideo) {
+        val recent = Hawk.get(RECENT_FILE, arrayListOf<String>())
+
+        val newRecent = arrayListOf<String>()
+        newRecent.addAll(recent)
+
+        recent.forEach {
+            if (it == baseVideo.data) newRecent.remove(it)
+        }
+
+        newRecent.add(0, baseVideo.data!!)
+
+        Hawk.put(RECENT_FILE, newRecent)
+        viewModel.requestAllRecent()
     }
 
     override fun addObservers() {

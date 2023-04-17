@@ -20,6 +20,21 @@ class MainViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val recentListLiveDataPrivate = MutableLiveData<Resource<List<BaseFile>>>()
+    val recentListLiveData: LiveData<Resource<List<BaseFile>>> get() = recentListLiveDataPrivate
+
+    fun requestAllRecent() {
+        viewModelScope.launch {
+            recentListLiveDataPrivate.value = Resource.Loading()
+            wrapEspressoIdlingResource {
+                repository.requestAllRecent().collect {
+                    recentListLiveDataPrivate.value = it
+                }
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val apkListLiveDataPrivate = MutableLiveData<Resource<List<BaseApk>>>()
     val apkListLiveData: LiveData<Resource<List<BaseApk>>> get() = apkListLiveDataPrivate
 

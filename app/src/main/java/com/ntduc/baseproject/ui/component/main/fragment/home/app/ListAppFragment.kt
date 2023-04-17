@@ -212,6 +212,4 @@ class ListAppFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_l
             }
         }
     }
-
-
 }

@@ -71,6 +71,10 @@ class DataRepository @Inject constructor(private val remoteRepository: RemoteDat
         }.flowOn(ioDispatcher)
     }
 
+    override suspend fun requestAllRecent(): Flow<Resource<List<BaseFile>>> {
+        return flow {
+            emit(localRepository.requestAllRecent())
+        }.flowOn(ioDispatcher)    }
     override suspend fun requestAllApk(): Flow<Resource<List<BaseApk>>> {
         return flow {
             emit(localRepository.requestAllApk())

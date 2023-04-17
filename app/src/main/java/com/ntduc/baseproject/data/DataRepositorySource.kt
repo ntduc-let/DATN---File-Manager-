@@ -19,6 +19,7 @@ interface DataRepositorySource {
     suspend fun removeFromFavourite(id: String): Flow<Resource<Boolean>>
     suspend fun isFavourite(id: String): Flow<Resource<Boolean>>
     suspend fun requestFrames(): Flow<Resource<DataFrames>>
+    suspend fun requestAllRecent(): Flow<Resource<List<BaseFile>>>
     suspend fun requestAllApk(): Flow<Resource<List<BaseApk>>>
     suspend fun requestAllApp(isSystem: Boolean): Flow<Resource<List<BaseApp>>>
     suspend fun requestAllVideos(): Flow<Resource<List<BaseVideo>>>

@@ -2,19 +2,27 @@ package com.ntduc.baseproject.ui.component.main.fragment
 
 import android.os.Bundle
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.IS_FAVORITE
+import com.ntduc.baseproject.constant.RECENT_FILE
+import com.ntduc.baseproject.data.Resource
+import com.ntduc.baseproject.data.dto.base.BaseFile
 import com.ntduc.baseproject.databinding.FragmentHomeBinding
 import com.ntduc.baseproject.ui.adapter.RecentFilesAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
-import com.ntduc.baseproject.ui.component.main.fragment.home.app.AppFragment
-import com.ntduc.baseproject.ui.component.main.fragment.home.video.VideoFragment
 import com.ntduc.baseproject.utils.DeviceUtils
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
+import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.formatBytes
 import com.ntduc.baseproject.utils.navigateToDes
+import com.ntduc.baseproject.utils.observe
+import com.ntduc.baseproject.utils.view.gone
+import com.ntduc.baseproject.utils.view.visible
+import com.orhanobut.hawk.Hawk
+import java.io.File
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
@@ -25,7 +33,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     override fun initView() {
         super.initView()
 
-        recentFilesAdapter = RecentFilesAdapter(requireContext())
+        recentFilesAdapter = RecentFilesAdapter(requireContext(), lifecycleScope)
         binding.recent.rcv.apply {
             adapter = recentFilesAdapter
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -46,11 +54,44 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     override fun initData() {
         super.initData()
 
+        viewModel.requestAllRecent()
         loadSizeInternalMemorySize()
+    }
+
+    override fun addObservers() {
+        super.addObservers()
+        observe(viewModel.recentListLiveData, ::handleRecentList)
+    }
+
+    private fun handleRecentList(status: Resource<List<BaseFile>>) {
+        when (status) {
+            is Resource.Loading -> {
+                if (recentFilesAdapter.currentList.isEmpty()) {
+                    binding.recent.root.gone()
+                }
+            }
+            is Resource.Success -> status.data?.let {
+                if (it.isEmpty()){
+                    binding.recent.root.gone()
+                    return@let
+                }
+
+                recentFilesAdapter.submitList(it)
+                binding.recent.root.visible()
+            }
+            is Resource.DataError -> {
+                binding.recent.root.gone()
+            }
+        }
     }
 
     override fun addEvent() {
         super.addEvent()
+
+        recentFilesAdapter.setOnOpenListener {
+            File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            updateRecent(it)
+        }
 
         binding.internalStorage.root.setOnClickShrinkEffectListener {
             navigateToDes(R.id.detailInternalStorageFragment)
@@ -85,6 +126,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             bundle.putBoolean(IS_FAVORITE, true)
             navigateToDes(R.id.audioFragment, bundle)
         }
+    }
+
+    private fun updateRecent(baseFile: BaseFile) {
+        val recent = Hawk.get(RECENT_FILE, arrayListOf<String>())
+
+        val newRecent = arrayListOf<String>()
+        newRecent.addAll(recent)
+
+        recent.forEach {
+            if (it == baseFile.data) newRecent.remove(it)
+        }
+
+        newRecent.add(0, baseFile.data!!)
+
+        Hawk.put(RECENT_FILE, newRecent)
+        viewModel.requestAllRecent()
     }
 
     private fun loadSizeInternalMemorySize() {

@@ -1,7 +1,6 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.image
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -11,24 +10,17 @@ import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseImage
-import com.ntduc.baseproject.data.dto.base.BaseVideo
 import com.ntduc.baseproject.data.dto.folder.FolderImageFile
 import com.ntduc.baseproject.databinding.FragmentListImageInFolderBinding
-import com.ntduc.baseproject.databinding.MenuDocumentDetailBinding
 import com.ntduc.baseproject.ui.adapter.ImageAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
-import com.ntduc.baseproject.ui.component.main.dialog.BasePopupWindow
 import com.ntduc.baseproject.ui.component.main.dialog.ImageMoreDialog
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
 import com.ntduc.baseproject.utils.*
-import com.ntduc.baseproject.utils.activity.getStatusBarHeight
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
-import com.ntduc.baseproject.utils.context.displayHeight
-import com.ntduc.baseproject.utils.file.delete
 import com.ntduc.baseproject.utils.file.open
-import com.ntduc.baseproject.utils.file.share
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.ntduc.recyclerviewsticky.StickyHeadersGridLayoutManager
@@ -85,11 +77,28 @@ class ListImageInFolderFragment : BaseFragment<FragmentListImageInFolderBinding>
 
         imageAdapter.setOnOpenListener {
             File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            updateRecent(it)
         }
 
         imageAdapter.setOnMoreListener { view, baseImage ->
             showMenu(view, baseImage)
         }
+    }
+
+    private fun updateRecent(baseImage: BaseImage) {
+        val recent = Hawk.get(RECENT_FILE, arrayListOf<String>())
+
+        val newRecent = arrayListOf<String>()
+        newRecent.addAll(recent)
+
+        recent.forEach {
+            if (it == baseImage.data) newRecent.remove(it)
+        }
+
+        newRecent.add(0, baseImage.data!!)
+
+        Hawk.put(RECENT_FILE, newRecent)
+        viewModel.requestAllRecent()
     }
 
     override fun addObservers() {

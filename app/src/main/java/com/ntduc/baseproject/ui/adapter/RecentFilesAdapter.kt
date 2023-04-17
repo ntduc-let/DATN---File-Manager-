@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FileTypeExtension
 import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.data.dto.base.BaseImage
 import com.ntduc.baseproject.databinding.ItemRecentFilesBinding
 import com.ntduc.baseproject.utils.formatBytes
 import com.ntduc.baseproject.utils.loadImg
@@ -23,7 +25,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class RecentFilesAdapter(
-    val context: Context
+    val context: Context,
+    val lifecycleScope: LifecycleCoroutineScope
 ) : BindingListAdapter<BaseFile, RecentFilesAdapter.FilesViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilesViewHolder =
@@ -39,8 +42,7 @@ class RecentFilesAdapter(
         fun bind(baseFile: BaseFile) {
             when (FileTypeExtension.getTypeFile(baseFile.data!!)) {
                 FileTypeExtension.AUDIO -> {
-                    val coroutineScope = itemView.findViewTreeLifecycleOwner()?.lifecycleScope ?: CoroutineScope(Dispatchers.IO)
-                    coroutineScope.launch {
+                    lifecycleScope.launch {
                         val image = try {
                             val mData = MediaMetadataRetriever()
                             mData.setDataSource(baseFile.data)
@@ -72,6 +74,12 @@ class RecentFilesAdapter(
             binding.title.text = baseFile.displayName
             binding.size.text = baseFile.size?.formatBytes()
 
+            binding.root.setOnClickListener {
+                onOpenListener?.let {
+                    it(baseFile)
+                }
+            }
+
             binding.executePendingBindings()
         }
     }
@@ -85,5 +93,11 @@ class RecentFilesAdapter(
             override fun areContentsTheSame(oldItem: BaseFile, newItem: BaseFile): Boolean =
                 oldItem == newItem
         }
+    }
+
+    private var onOpenListener: ((BaseFile) -> Unit)? = null
+
+    fun setOnOpenListener(listener: (BaseFile) -> Unit) {
+        onOpenListener = listener
     }
 }

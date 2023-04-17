@@ -15,7 +15,6 @@ import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.ui.component.main.dialog.VideoMoreDialog
-import com.ntduc.baseproject.ui.component.main.fragment.home.app.AppFragment
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.view.gone
@@ -67,11 +66,28 @@ class ListVideoFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragme
 
         videoAdapter.setOnOpenListener {
             File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            updateRecent(it)
         }
 
         videoAdapter.setOnMoreListener { view, baseVideo ->
             showMenu(view, baseVideo)
         }
+    }
+
+    private fun updateRecent(baseVideo: BaseVideo) {
+        val recent = Hawk.get(RECENT_FILE, arrayListOf<String>())
+
+        val newRecent = arrayListOf<String>()
+        newRecent.addAll(recent)
+
+        recent.forEach {
+            if (it == baseVideo.data) newRecent.remove(it)
+        }
+
+        newRecent.add(0, baseVideo.data!!)
+
+        Hawk.put(RECENT_FILE, newRecent)
+        viewModel.requestAllRecent()
     }
 
     private fun showMenu(view: View, baseVideo: BaseVideo) {

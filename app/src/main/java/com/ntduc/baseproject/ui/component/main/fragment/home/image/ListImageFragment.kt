@@ -66,11 +66,28 @@ class ListImageFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragme
 
         imageAdapter.setOnOpenListener {
             File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            updateRecent(it)
         }
 
         imageAdapter.setOnMoreListener { view, baseImage ->
             showMenu(view, baseImage)
         }
+    }
+
+    private fun updateRecent(baseImage: BaseImage) {
+        val recent = Hawk.get(RECENT_FILE, arrayListOf<String>())
+
+        val newRecent = arrayListOf<String>()
+        newRecent.addAll(recent)
+
+        recent.forEach {
+            if (it == baseImage.data) newRecent.remove(it)
+        }
+
+        newRecent.add(0, baseImage.data!!)
+
+        Hawk.put(RECENT_FILE, newRecent)
+        viewModel.requestAllRecent()
     }
 
     private fun showMenu(view: View, baseImage: BaseImage) {
