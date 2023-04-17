@@ -88,4 +88,8 @@
         android:id="@+id/folderVideoDetailFragment"
         android:name="com.ntduc.baseproject.ui.component.main.fragment.home.video.FolderVideoDetailFragment"
         android:label="FolderVideoDetailFragment" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.home.search.SearchFragment"
+        android:label="SearchFragment" />
 </navigation>

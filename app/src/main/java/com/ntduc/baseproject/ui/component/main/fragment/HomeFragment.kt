@@ -93,6 +93,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             updateRecent(it)
         }
 
+        binding.search.root.setOnClickShrinkEffectListener {
+            navigateToDes(R.id.searchFragment)
+        }
+
         binding.internalStorage.root.setOnClickShrinkEffectListener {
             navigateToDes(R.id.detailInternalStorageFragment)
         }

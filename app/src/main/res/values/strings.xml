@@ -63,5 +63,7 @@
     <string name="create_new_playlist">Create new playlist</string>
     <string name="resolution">Resolution</string>
     <string name="favorite">Favorite</string>
+    <string name="search">Search</string>
+    <string name="search_files">Search files</string>
 
 </resources>

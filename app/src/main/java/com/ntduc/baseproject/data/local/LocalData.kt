@@ -73,12 +73,18 @@ class LocalData @Inject constructor(val context: Context) {
         return Resource.Success(isSuccess)
     }
 
+    fun requestAllSearch(key: String): Resource<List<BaseFile>> {
+        val baseFileList = context.getFiles()
+        val result = baseFileList.filter { it.displayName!!.contains(key, true) }
+        return Resource.Success(result)
+    }
+
     fun requestAllRecent(): Resource<List<BaseFile>> {
         val result = arrayListOf<BaseFile>()
 
         val listRecent = Hawk.get(RECENT_FILE, listOf<String>())
         val baseFileList = context.getFiles()
-        listRecent.forEach {path ->
+        listRecent.forEach { path ->
             run forE@{
                 baseFileList.forEach {
                     if (it.data == path) {

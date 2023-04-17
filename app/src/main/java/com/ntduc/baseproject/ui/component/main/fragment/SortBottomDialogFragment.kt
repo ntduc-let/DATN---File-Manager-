@@ -4,6 +4,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
+import com.ntduc.baseproject.data.dto.base.BaseImage
 import com.ntduc.baseproject.databinding.DialogSortBinding
 import com.ntduc.baseproject.ui.base.BaseBottomSheetDialogFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
@@ -105,6 +106,9 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
         viewModel.requestAllAudio()
         viewModel.requestAllImages()
         viewModel.requestAllVideos()
+        onSortListener?.let {
+            it()
+        }
     }
 
     private fun resetSort() {
@@ -121,5 +125,11 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
         binding.sortByDateOld.select.gone()
         binding.sortBySizeLarge.select.gone()
         binding.sortBySizeSmall.select.gone()
+    }
+
+    private var onSortListener: (() -> Unit)? = null
+
+    fun setOnSortListener(listener: () -> Unit) {
+        onSortListener = listener
     }
 }
