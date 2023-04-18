@@ -12,8 +12,8 @@
         android:id="@+id/securityFragment"
         android:icon="@drawable/ic_bnv_security"
         android:title="@string/security" />
-    <item
-        android:id="@+id/cleanFragment"
-        android:icon="@drawable/ic_bnv_clean"
-        android:title="@string/clean" />
+<!--    <item-->
+<!--        android:id="@+id/cleanFragment"-->
+<!--        android:icon="@drawable/ic_bnv_clean"-->
+<!--        android:title="@string/clean" />-->
 </menu>

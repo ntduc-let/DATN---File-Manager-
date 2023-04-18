@@ -2,20 +2,22 @@ package com.ntduc.baseproject.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.webkit.MimeTypeMap
 import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.*
 import com.ntduc.baseproject.data.dto.login.LoginRequest
 import com.ntduc.baseproject.data.dto.login.LoginResponse
 import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
+import com.ntduc.baseproject.data.dto.root.FolderFile
 import com.ntduc.baseproject.data.error.PASS_WORD_ERROR
-import com.ntduc.baseproject.utils.file.getAudios
-import com.ntduc.baseproject.utils.file.getFiles
-import com.ntduc.baseproject.utils.file.getImages
-import com.ntduc.baseproject.utils.file.getVideos
+import com.ntduc.baseproject.utils.currentMillis
+import com.ntduc.baseproject.utils.file.*
 import com.ntduc.baseproject.utils.getApks
 import com.ntduc.baseproject.utils.getApps
 import com.orhanobut.hawk.Hawk
+import java.io.File
+import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -71,6 +73,28 @@ class LocalData @Inject constructor(val context: Context) {
         editor.apply()
         val isSuccess = editor.commit()
         return Resource.Success(isSuccess)
+    }
+
+    fun requestAllFolderFile(path: String): Resource<List<FolderFile>> {
+        val files = File(path)
+        val result = ArrayList<FolderFile>()
+        files.listFiles()?.forEach {
+            if (!it.isHidden) {
+                val folderFile = FolderFile(
+                    id = currentMillis,
+                    displayName = it.nameWithoutExtension,
+                    title = it.name,
+                    mimeType = it.mimeType(),
+                    size = it.length(),
+                    dateAdded = it.lastModified(),
+                    dateModified = it.lastModified(),
+                    data = it.path,
+                    isSelected = false
+                )
+                result.add(folderFile)
+            }
+        }
+        return Resource.Success(result)
     }
 
     fun requestAllSearch(key: String): Resource<List<BaseFile>> {

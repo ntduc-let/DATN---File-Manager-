@@ -6,6 +6,8 @@ import com.ntduc.baseproject.data.dto.login.LoginRequest
 import com.ntduc.baseproject.data.dto.login.LoginResponse
 import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
 import com.ntduc.baseproject.data.dto.recipes.Recipes
+import com.ntduc.baseproject.data.dto.root.FolderFile
+import com.ntduc.baseproject.data.dto.root.RootFolder
 import com.ntduc.baseproject.data.local.LocalData
 import com.ntduc.baseproject.data.remote.RemoteData
 import kotlinx.coroutines.flow.Flow
@@ -68,6 +70,12 @@ class DataRepository @Inject constructor(private val remoteRepository: RemoteDat
     override suspend fun requestFrames(): Flow<Resource<DataFrames>> {
         return flow {
             emit(remoteRepository.requestFrames())
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun requestAllFolderFile(path: String): Flow<Resource<List<FolderFile>>> {
+        return flow {
+            emit(localRepository.requestAllFolderFile(path))
         }.flowOn(ioDispatcher)
     }
 

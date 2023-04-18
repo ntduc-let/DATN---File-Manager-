@@ -65,5 +65,9 @@
     <string name="favorite">Favorite</string>
     <string name="search">Search</string>
     <string name="search_files">Search files</string>
+    <string name="file">File</string>
+    <string name="default_phone_card">Default phone card</string>
+    <string name="select">Select</string>
+    <string name="move">Move</string>
 
 </resources>

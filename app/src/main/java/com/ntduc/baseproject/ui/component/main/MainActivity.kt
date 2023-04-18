@@ -37,7 +37,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         appBarConfiguration = setupNavigationWithNavigationBar(
             navController = navController,
             bottomNavigationView = binding.bnv,
-            topLevelDestinationIds = setOf(R.id.homeFragment, R.id.filesFragment, R.id.securityFragment, R.id.cleanFragment)
+            topLevelDestinationIds = setOf(R.id.homeFragment, R.id.filesFragment, R.id.securityFragment)
         )
 
         navController.addOnDestinationChangedListener { _: NavController?, navDestination: NavDestination, _: Bundle? ->

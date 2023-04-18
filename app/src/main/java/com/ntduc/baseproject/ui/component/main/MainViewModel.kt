@@ -8,6 +8,7 @@ import com.ntduc.baseproject.data.DataRepositorySource
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.*
 import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
+import com.ntduc.baseproject.data.dto.root.FolderFile
 import com.ntduc.baseproject.ui.base.BaseViewModel
 import com.ntduc.baseproject.utils.wrapEspressoIdlingResource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +19,21 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repository: DataRepositorySource
 ) : BaseViewModel() {
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val folderFileListLiveDataPrivate = MutableLiveData<Resource<List<FolderFile>>>()
+    val folderFileListLiveData: LiveData<Resource<List<FolderFile>>> get() = folderFileListLiveDataPrivate
+
+    fun requestAllFolderFile(path: String) {
+        viewModelScope.launch {
+            folderFileListLiveDataPrivate.value = Resource.Loading()
+            wrapEspressoIdlingResource {
+                repository.requestAllFolderFile(path).collect {
+                    folderFileListLiveDataPrivate.value = it
+                }
+            }
+        }
+    }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val searchListLiveDataPrivate = MutableLiveData<Resource<List<BaseFile>>>()
