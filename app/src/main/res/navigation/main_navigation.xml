@@ -92,4 +92,8 @@
         android:id="@+id/searchFragment"
         android:name="com.ntduc.baseproject.ui.component.main.fragment.home.search.SearchFragment"
         android:label="SearchFragment" />
+    <fragment
+        android:id="@+id/homeSafeFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.security.HomeSafeFragment"
+        android:label="HomeSafeFragment" />
 </navigation>

@@ -69,5 +69,11 @@
     <string name="default_phone_card">Default phone card</string>
     <string name="select">Select</string>
     <string name="move">Move</string>
+    <string name="protect_your">Protect your private files</string>
+    <string name="enter_password">Enter password</string>
+    <string name="incorrect_password">Incorrect password</string>
+    <string name="login">Login</string>
+    <string name="create">Create</string>
+    <string name="enter_pin">Enter PIN</string>
 
 </resources>

@@ -15,4 +15,5 @@
     <color name="monochrome_500">#6B7280</color>
     <color name="monochrome_700">#374151</color>
     <color name="blue_second">#DFF0FD</color>
+    <color name="blue_third">#A4CDF8</color>
 </resources>

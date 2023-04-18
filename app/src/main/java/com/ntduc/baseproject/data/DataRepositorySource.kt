@@ -1,5 +1,6 @@
 package com.ntduc.baseproject.data
 
+import android.content.Context
 import com.ntduc.baseproject.data.dto.base.*
 import com.ntduc.baseproject.data.dto.frames.DataFrames
 import com.ntduc.baseproject.data.dto.login.LoginRequest
@@ -9,6 +10,7 @@ import com.ntduc.baseproject.data.dto.recipes.Recipes
 import com.ntduc.baseproject.data.dto.root.FolderFile
 import com.ntduc.baseproject.data.dto.root.RootFolder
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 /**
  * Created by TruyenIT
@@ -21,6 +23,11 @@ interface DataRepositorySource {
     suspend fun removeFromFavourite(id: String): Flow<Resource<Boolean>>
     suspend fun isFavourite(id: String): Flow<Resource<Boolean>>
     suspend fun requestFrames(): Flow<Resource<DataFrames>>
+    suspend fun loadApkSafe(context: Context): Flow<Resource<List<File>>>
+    suspend fun loadVideoSafe(context: Context): Flow<Resource<List<File>>>
+    suspend fun loadDocumentSafe(context: Context): Flow<Resource<List<File>>>
+    suspend fun loadImageSafe(context: Context): Flow<Resource<List<File>>>
+    suspend fun loadAudioSafe(context: Context): Flow<Resource<List<File>>>
     suspend fun requestAllFolderFile(path: String): Flow<Resource<List<FolderFile>>>
     suspend fun requestAllSearch(key: String): Flow<Resource<List<BaseFile>>>
     suspend fun requestAllRecent(): Flow<Resource<List<BaseFile>>>

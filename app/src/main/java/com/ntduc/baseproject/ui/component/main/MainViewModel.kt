@@ -1,5 +1,6 @@
 package com.ntduc.baseproject.ui.component.main
 
+import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,12 +14,88 @@ import com.ntduc.baseproject.ui.base.BaseViewModel
 import com.ntduc.baseproject.utils.wrapEspressoIdlingResource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: DataRepositorySource
 ) : BaseViewModel() {
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val audioSafeListLiveDataPrivate = MutableLiveData<Resource<List<File>>>()
+    val audioSafeListLiveData: LiveData<Resource<List<File>>> get() = audioSafeListLiveDataPrivate
+
+    fun loadAudioSafe(context: Context) {
+        viewModelScope.launch {
+            audioSafeListLiveDataPrivate.value = Resource.Loading()
+            wrapEspressoIdlingResource {
+                repository.loadImageSafe(context).collect {
+                    audioSafeListLiveDataPrivate.value = it
+                }
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val imageSafeListLiveDataPrivate = MutableLiveData<Resource<List<File>>>()
+    val imageSafeListLiveData: LiveData<Resource<List<File>>> get() = imageSafeListLiveDataPrivate
+
+    fun loadImageSafe(context: Context) {
+        viewModelScope.launch {
+            imageSafeListLiveDataPrivate.value = Resource.Loading()
+            wrapEspressoIdlingResource {
+                repository.loadImageSafe(context).collect {
+                    imageSafeListLiveDataPrivate.value = it
+                }
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val documentSafeListLiveDataPrivate = MutableLiveData<Resource<List<File>>>()
+    val documentSafeListLiveData: LiveData<Resource<List<File>>> get() = documentSafeListLiveDataPrivate
+
+    fun loadDocumentSafe(context: Context) {
+        viewModelScope.launch {
+            documentSafeListLiveDataPrivate.value = Resource.Loading()
+            wrapEspressoIdlingResource {
+                repository.loadDocumentSafe(context).collect {
+                    documentSafeListLiveDataPrivate.value = it
+                }
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val videoSafeListLiveDataPrivate = MutableLiveData<Resource<List<File>>>()
+    val videoSafeListLiveData: LiveData<Resource<List<File>>> get() = videoSafeListLiveDataPrivate
+
+    fun loadVideoSafe(context: Context) {
+        viewModelScope.launch {
+            videoSafeListLiveDataPrivate.value = Resource.Loading()
+            wrapEspressoIdlingResource {
+                repository.loadVideoSafe(context).collect {
+                    videoSafeListLiveDataPrivate.value = it
+                }
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val apkSafeListLiveDataPrivate = MutableLiveData<Resource<List<File>>>()
+    val apkSafeListLiveData: LiveData<Resource<List<File>>> get() = apkSafeListLiveDataPrivate
+
+    fun loadApkSafe(context: Context) {
+        viewModelScope.launch {
+            apkSafeListLiveDataPrivate.value = Resource.Loading()
+            wrapEspressoIdlingResource {
+                repository.loadApkSafe(context).collect {
+                    apkSafeListLiveDataPrivate.value = it
+                }
+            }
+        }
+    }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val folderFileListLiveDataPrivate = MutableLiveData<Resource<List<FolderFile>>>()

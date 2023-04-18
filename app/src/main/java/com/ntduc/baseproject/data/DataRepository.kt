@@ -1,5 +1,6 @@
 package com.ntduc.baseproject.data
 
+import android.content.Context
 import com.ntduc.baseproject.data.dto.base.*
 import com.ntduc.baseproject.data.dto.frames.DataFrames
 import com.ntduc.baseproject.data.dto.login.LoginRequest
@@ -7,12 +8,12 @@ import com.ntduc.baseproject.data.dto.login.LoginResponse
 import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
 import com.ntduc.baseproject.data.dto.recipes.Recipes
 import com.ntduc.baseproject.data.dto.root.FolderFile
-import com.ntduc.baseproject.data.dto.root.RootFolder
 import com.ntduc.baseproject.data.local.LocalData
 import com.ntduc.baseproject.data.remote.RemoteData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -70,6 +71,36 @@ class DataRepository @Inject constructor(private val remoteRepository: RemoteDat
     override suspend fun requestFrames(): Flow<Resource<DataFrames>> {
         return flow {
             emit(remoteRepository.requestFrames())
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun loadApkSafe(context: Context): Flow<Resource<List<File>>> {
+        return flow {
+            emit(localRepository.loadApkSafe(context))
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun loadVideoSafe(context: Context): Flow<Resource<List<File>>> {
+        return flow {
+            emit(localRepository.loadVideoSafe(context))
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun loadDocumentSafe(context: Context): Flow<Resource<List<File>>> {
+        return flow {
+            emit(localRepository.loadDocumentSafe(context))
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun loadImageSafe(context: Context): Flow<Resource<List<File>>> {
+        return flow {
+            emit(localRepository.loadImageSafe(context))
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun loadAudioSafe(context: Context): Flow<Resource<List<File>>> {
+        return flow {
+            emit(localRepository.loadAudioSafe(context))
         }.flowOn(ioDispatcher)
     }
 
