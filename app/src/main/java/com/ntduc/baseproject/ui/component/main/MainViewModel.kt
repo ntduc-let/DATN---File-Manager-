@@ -30,7 +30,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             audioSafeListLiveDataPrivate.value = Resource.Loading()
             wrapEspressoIdlingResource {
-                repository.loadImageSafe(context).collect {
+                repository.loadAudioSafe(context).collect {
                     audioSafeListLiveDataPrivate.value = it
                 }
             }

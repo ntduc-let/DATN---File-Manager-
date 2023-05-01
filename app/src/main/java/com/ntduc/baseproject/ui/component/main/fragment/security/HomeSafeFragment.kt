@@ -10,6 +10,7 @@ import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.formatBytes
+import com.ntduc.baseproject.utils.navigateToDes
 import com.ntduc.baseproject.utils.observe
 import com.ntduc.baseproject.utils.view.gone
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +51,26 @@ class HomeSafeFragment : BaseFragment<FragmentHomeSafeBinding>(R.layout.fragment
 
         binding.back.setOnClickShrinkEffectListener {
             findNavController().popBackStack()
+        }
+
+        binding.apps.root.setOnClickShrinkEffectListener {
+            navigateToDes(R.id.listApkSafeFragment)
+        }
+
+        binding.audio.root.setOnClickShrinkEffectListener {
+            navigateToDes(R.id.listAudioSafeFragment)
+        }
+
+        binding.document.root.setOnClickShrinkEffectListener {
+            navigateToDes(R.id.documentSafeFragment)
+        }
+
+        binding.images.root.setOnClickShrinkEffectListener {
+            navigateToDes(R.id.listImageSafeFragment)
+        }
+
+        binding.videos.root.setOnClickShrinkEffectListener {
+            navigateToDes(R.id.listVideoSafeFragment)
         }
     }
 

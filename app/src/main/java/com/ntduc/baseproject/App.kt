@@ -5,7 +5,7 @@ import com.orhanobut.hawk.Hawk
 import dagger.hilt.android.HiltAndroidApp
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 @HiltAndroidApp
 open class App : Application() {

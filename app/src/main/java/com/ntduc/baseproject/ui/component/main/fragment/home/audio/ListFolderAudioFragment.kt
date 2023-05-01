@@ -1,13 +1,23 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.audio
 
 import android.os.Bundle
+import android.os.Environment
 import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.constant.*
+import com.ntduc.baseproject.constant.FAVORITE_AUDIO
+import com.ntduc.baseproject.constant.IS_FAVORITE
+import com.ntduc.baseproject.constant.KEY_BASE_FOLDER_AUDIO
+import com.ntduc.baseproject.constant.SORT_BY
+import com.ntduc.baseproject.constant.SORT_BY_DATE_NEW
+import com.ntduc.baseproject.constant.SORT_BY_DATE_OLD
+import com.ntduc.baseproject.constant.SORT_BY_NAME_A_Z
+import com.ntduc.baseproject.constant.SORT_BY_NAME_Z_A
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_LARGE
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_SMALL
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseAudio
 import com.ntduc.baseproject.data.dto.base.BaseFile
@@ -18,10 +28,12 @@ import com.ntduc.baseproject.ui.adapter.FolderAudioAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.BasePopupWindow
-import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.activity.getStatusBarHeight
 import com.ntduc.baseproject.utils.context.displayHeight
+import com.ntduc.baseproject.utils.dp
 import com.ntduc.baseproject.utils.file.delete
+import com.ntduc.baseproject.utils.navigateToDes
+import com.ntduc.baseproject.utils.observe
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
@@ -123,17 +135,23 @@ class ListFolderAudioFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val listQuery = arrayListOf<BaseAudio>()
-                    if (isFavorite) {
-                        val listFavorite = Hawk.get(FAVORITE_AUDIO, arrayListOf<String>())
-                        it.forEach {
-                            if (listFavorite.contains(it.data)) listQuery.add(it)
-                        }
-                    } else {
-                        listQuery.addAll(it)
+                    val listQuery1 = arrayListOf<BaseAudio>()
+
+                    it.forEach {
+                        if (!it.data!!.startsWith(File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}").path)) listQuery1.add(it)
                     }
 
-                    val temp = filterFolderFile(listQuery)
+                    val listQuery2 = arrayListOf<BaseAudio>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_AUDIO, arrayListOf<String>())
+                        listQuery1.forEach {
+                            if (listFavorite.contains(it.data)) listQuery2.add(it)
+                        }
+                    } else {
+                        listQuery2.addAll(listQuery1)
+                    }
+
+                    val temp = filterFolderFile(listQuery2)
                     if (temp.isEmpty()) {
                         withContext(Dispatchers.Main) {
                             binding.rcv.gone()

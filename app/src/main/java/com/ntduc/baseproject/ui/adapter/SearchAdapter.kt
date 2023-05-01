@@ -2,8 +2,10 @@ package com.ntduc.baseproject.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
+import android.os.Build
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
@@ -42,6 +44,31 @@ class SearchAdapter(
             binding.more.gone()
 
             when (FileTypeExtension.getTypeFile(baseFile.data!!)) {
+                FileTypeExtension.APK -> {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            context.packageManager.getPackageArchiveInfo(baseFile.data!!, PackageManager.PackageInfoFlags.of(0))
+                        } else {
+                            context.packageManager.getPackageArchiveInfo(baseFile.data!!, 0)
+                        }
+                        val icon = if (pi != null) {
+                            pi.applicationInfo.sourceDir = baseFile.data!!
+                            pi.applicationInfo.publicSourceDir = baseFile.data!!
+
+                            pi.applicationInfo.loadIcon(context.packageManager)
+                        } else {
+                            null
+                        }
+
+                        withContext(Dispatchers.Main){
+                            if (icon != null) {
+                                binding.ic.setImageDrawable(icon)
+                            } else {
+                                binding.ic.setImageResource(R.drawable.ic_launcher_foreground)
+                            }
+                        }
+                    }
+                }
                 FileTypeExtension.AUDIO -> {
                     lifecycleScope.launch {
                         val image = try {
@@ -62,6 +89,14 @@ class SearchAdapter(
                             )
                         }
                     }
+                }
+                FileTypeExtension.PDF, FileTypeExtension.TXT, FileTypeExtension.DOC, FileTypeExtension.XLS, FileTypeExtension.PPT -> {
+                    context.loadImg(
+                        imgUrl = baseFile.data!!,
+                        view = binding.ic,
+                        error = FileTypeExtension.getIconDocument(baseFile.data!!),
+                        placeHolder = R.color.black
+                    )
                 }
                 else -> {
                     context.loadImg(

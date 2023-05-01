@@ -1,6 +1,7 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.video
 
 import android.os.Bundle
+import android.os.Environment
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -13,10 +14,15 @@ import com.ntduc.baseproject.databinding.FragmentListImageBinding
 import com.ntduc.baseproject.ui.adapter.VideoAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
+import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
+import com.ntduc.baseproject.ui.component.main.dialog.MoveSafeFolderDialog
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.ui.component.main.dialog.VideoMoreDialog
 import com.ntduc.baseproject.utils.*
+import com.ntduc.baseproject.utils.file.delete
 import com.ntduc.baseproject.utils.file.open
+import com.ntduc.baseproject.utils.security.FileEncryption
+import com.ntduc.baseproject.utils.toast.shortToast
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.ntduc.recyclerviewsticky.StickyHeadersGridLayoutManager
@@ -25,6 +31,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.*
 
 class ListVideoFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragment_list_image) {
@@ -104,6 +112,34 @@ class ListVideoFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragme
             bundle.putParcelable(KEY_BASE_VIDEO, baseVideo)
             navigateToDes(R.id.videoDetailFragment, bundle)
         }
+        dialogMore.setOnMoveSafeFolderListener {
+            val dialogSafeFolder = MoveSafeFolderDialog.newInstance(it)
+            dialogSafeFolder.setOnMoveListener { baseFileEncryption, pin ->
+                val dialogLoading = LoadingEncryptionDialog()
+                dialogLoading.show(childFragmentManager, "LoadingEncryptionDialog")
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val folder = File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}/.SafeFolder/video")
+                    if (!folder.exists()) {
+                        folder.mkdirs()
+                    }
+                    FileEncryption.encryptToFile(
+                        "$pin$pin$pin$pin",
+                        "abcdefghptreqwrf",
+                        FileInputStream(File(baseFileEncryption.data!!)),
+                        FileOutputStream(File("${folder.path}/${baseFileEncryption.displayName}"))
+                    )
+
+                    File(baseFileEncryption.data!!).delete(requireContext())
+
+                    withContext(Dispatchers.Main) {
+                        shortToast("Chuyển đổi thành công")
+                        dialogLoading.dismiss()
+                        viewModel.requestAllVideos()
+                    }
+                }
+            }
+            dialogSafeFolder.show(childFragmentManager, "MoveSafeFolderDialog")
+        }
         dialogMore.show(childFragmentManager, "VideoMoreDialog")
     }
 
@@ -129,17 +165,23 @@ class ListVideoFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragme
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val listQuery = arrayListOf<BaseVideo>()
-                    if (isFavorite) {
-                        val listFavorite = Hawk.get(FAVORITE_VIDEO, arrayListOf<String>())
-                        it.forEach {
-                            if (listFavorite.contains(it.data)) listQuery.add(it)
-                        }
-                    } else {
-                        listQuery.addAll(it)
+                    val listQuery1 = arrayListOf<BaseVideo>()
+
+                    it.forEach {
+                        if (!it.data!!.startsWith(File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}").path)) listQuery1.add(it)
                     }
 
-                    if (listQuery.isEmpty()) {
+                    val listQuery2 = arrayListOf<BaseVideo>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_VIDEO, arrayListOf<String>())
+                        listQuery1.forEach {
+                            if (listFavorite.contains(it.data)) listQuery2.add(it)
+                        }
+                    } else {
+                        listQuery2.addAll(listQuery1)
+                    }
+
+                    if (listQuery2.isEmpty()) {
                         withContext(Dispatchers.Main) {
                             binding.rcv.gone()
                             binding.layoutNoItem.root.visible()
@@ -151,27 +193,27 @@ class ListVideoFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragme
 
                     val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
                         SORT_BY_NAME_A_Z -> {
-                            val temp = listQuery.sortedBy { item -> item.displayName?.uppercase() }
+                            val temp = listQuery2.sortedBy { item -> item.displayName?.uppercase() }
                             filterBy(temp, NAME_HEAD)
                         }
                         SORT_BY_NAME_Z_A -> {
-                            val temp = listQuery.sortedBy { item -> item.displayName?.uppercase() }.reversed()
+                            val temp = listQuery2.sortedBy { item -> item.displayName?.uppercase() }.reversed()
                             filterBy(temp, NAME_HEAD)
                         }
                         SORT_BY_DATE_NEW -> {
-                            val temp = listQuery.sortedBy { item -> item.dateModified }.reversed()
+                            val temp = listQuery2.sortedBy { item -> item.dateModified }.reversed()
                             filterBy(temp, DATE_HEAD)
                         }
                         SORT_BY_DATE_OLD -> {
-                            val temp = listQuery.sortedBy { item -> item.dateModified }
+                            val temp = listQuery2.sortedBy { item -> item.dateModified }
                             filterBy(temp, DATE_HEAD)
                         }
                         SORT_BY_SIZE_LARGE -> {
-                            val temp = listQuery.sortedBy { item -> item.size }.reversed()
+                            val temp = listQuery2.sortedBy { item -> item.size }.reversed()
                             filterBy(temp, SIZE_HEAD)
                         }
                         SORT_BY_SIZE_SMALL -> {
-                            val temp = listQuery.sortedBy { item -> item.size }
+                            val temp = listQuery2.sortedBy { item -> item.size }
                             filterBy(temp, SIZE_HEAD)
                         }
                         else -> listOf()

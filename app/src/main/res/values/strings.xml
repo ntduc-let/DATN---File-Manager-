@@ -75,5 +75,12 @@
     <string name="login">Login</string>
     <string name="create">Create</string>
     <string name="enter_pin">Enter PIN</string>
+    <string name="move_to_safe_folder">Move to safe folder</string>
+    <string name="security_apks">Security apks</string>
+    <string name="move_out_of_safe_folder">Move out of safe folder</string>
+    <string name="security_audio">Security audio</string>
+    <string name="security_document">Security document</string>
+    <string name="security_images">Security images</string>
+    <string name="security_video">Security video</string>
 
 </resources>

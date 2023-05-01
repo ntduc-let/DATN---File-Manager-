@@ -1,7 +1,7 @@
 package com.ntduc.baseproject.data.dto.login
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 data class LoginResponse(val id: String, val firstName: String, val lastName: String,
                          val streetName: String, val buildingNumber: String,

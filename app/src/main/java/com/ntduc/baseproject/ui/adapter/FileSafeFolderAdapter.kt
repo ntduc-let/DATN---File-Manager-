@@ -6,53 +6,56 @@ import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.os.Build
+import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FileTypeExtension
-import com.ntduc.baseproject.data.dto.base.BaseFile
-import com.ntduc.baseproject.data.dto.base.BaseImage
-import com.ntduc.baseproject.databinding.ItemRecentFilesBinding
-import com.ntduc.baseproject.utils.formatBytes
-import com.ntduc.baseproject.utils.loadImg
+import com.ntduc.baseproject.data.dto.base.BaseApk
+import com.ntduc.baseproject.databinding.ItemDocumentBinding
+import com.ntduc.baseproject.utils.*
+import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
+import com.ntduc.baseproject.utils.view.gone
 import com.skydoves.bindables.BindingListAdapter
 import com.skydoves.bindables.binding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.*
 
-class RecentFilesAdapter(
+
+class FileSafeFolderAdapter(
     val context: Context,
     val lifecycleScope: LifecycleCoroutineScope
-) : BindingListAdapter<BaseFile, RecentFilesAdapter.FilesViewHolder>(diffUtil) {
+) : BindingListAdapter<File, FileSafeFolderAdapter.ItemViewHolder>(diffUtil) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilesViewHolder =
-        parent.binding<ItemRecentFilesBinding>(R.layout.item_recent_files).let(::FilesViewHolder)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder =
+        parent.binding<ItemDocumentBinding>(R.layout.item_document).let(::ItemViewHolder)
 
-    override fun onBindViewHolder(holder: FilesViewHolder, position: Int) =
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) =
         holder.bind(getItem(position))
 
-    inner class FilesViewHolder constructor(
-        private val binding: ItemRecentFilesBinding
+    inner class ItemViewHolder constructor(
+        private val binding: ItemDocumentBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(baseFile: BaseFile) {
-            when (FileTypeExtension.getTypeFile(baseFile.data!!)) {
+        fun bind(file: File) {
+            binding.favorite.gone()
+
+            when (FileTypeExtension.getTypeFile(file.path)) {
                 FileTypeExtension.APK -> {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            context.packageManager.getPackageArchiveInfo(baseFile.data!!, PackageManager.PackageInfoFlags.of(0))
+                            context.packageManager.getPackageArchiveInfo(file.path, PackageManager.PackageInfoFlags.of(0))
                         } else {
-                            context.packageManager.getPackageArchiveInfo(baseFile.data!!, 0)
+                            context.packageManager.getPackageArchiveInfo(file.path, 0)
                         }
                         val icon = if (pi != null) {
-                            pi.applicationInfo.sourceDir = baseFile.data!!
-                            pi.applicationInfo.publicSourceDir = baseFile.data!!
+                            pi.applicationInfo.sourceDir = file.path
+                            pi.applicationInfo.publicSourceDir = file.path
 
                             pi.applicationInfo.loadIcon(context.packageManager)
                         } else {
@@ -68,12 +71,11 @@ class RecentFilesAdapter(
                         }
                     }
                 }
-
                 FileTypeExtension.AUDIO -> {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val image = try {
                             val mData = MediaMetadataRetriever()
-                            mData.setDataSource(baseFile.data)
+                            mData.setDataSource(file.path)
                             val art = mData.embeddedPicture
                             BitmapFactory.decodeByteArray(art, 0, art!!.size)
                         } catch (e: Exception) {
@@ -84,7 +86,7 @@ class RecentFilesAdapter(
                             context.loadImg(
                                 imgUrl = image,
                                 view = binding.ic,
-                                error = FileTypeExtension.getIconFile(baseFile.data!!),
+                                error = FileTypeExtension.getIconFile(file.path),
                                 placeHolder = R.color.black
                             )
                         }
@@ -92,27 +94,34 @@ class RecentFilesAdapter(
                 }
                 FileTypeExtension.PDF, FileTypeExtension.TXT, FileTypeExtension.DOC, FileTypeExtension.XLS, FileTypeExtension.PPT -> {
                     context.loadImg(
-                        imgUrl = baseFile.data!!,
+                        imgUrl = file.path,
                         view = binding.ic,
-                        error = FileTypeExtension.getIconDocument(baseFile.data!!),
+                        error = FileTypeExtension.getIconDocument(file.path),
                         placeHolder = R.color.black
                     )
                 }
                 else -> {
                     context.loadImg(
-                        imgUrl = baseFile.data!!,
+                        imgUrl = file.path,
                         view = binding.ic,
-                        error = FileTypeExtension.getIconFile(baseFile.data!!),
+                        error = FileTypeExtension.getIconFile(file.path),
                         placeHolder = R.color.black
                     )
                 }
             }
-            binding.title.text = baseFile.displayName
-            binding.size.text = baseFile.size?.formatBytes()
+            binding.title.text = file.name
+
+            binding.description.text = "${file.length().formatBytes()} ∙ ${getDateTimeFromMillis(millis = file.lastModified(), dateFormat = "MMM dd yyyy", locale = Locale.ENGLISH)}"
 
             binding.root.setOnClickListener {
                 onOpenListener?.let {
-                    it(baseFile)
+                    it(file)
+                }
+            }
+
+            binding.more.setOnClickShrinkEffectListener {
+                onMoreListener?.let {
+                    it(binding.root, file)
                 }
             }
 
@@ -121,19 +130,25 @@ class RecentFilesAdapter(
     }
 
     companion object {
-        private val diffUtil = object : DiffUtil.ItemCallback<BaseFile>() {
-            override fun areItemsTheSame(oldItem: BaseFile, newItem: BaseFile): Boolean =
-                oldItem.id == newItem.id
+        private val diffUtil = object : DiffUtil.ItemCallback<File>() {
+            override fun areItemsTheSame(oldItem: File, newItem: File): Boolean =
+                oldItem.path == newItem.path
 
             @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: BaseFile, newItem: BaseFile): Boolean =
+            override fun areContentsTheSame(oldItem: File, newItem: File): Boolean =
                 oldItem == newItem
         }
     }
 
-    private var onOpenListener: ((BaseFile) -> Unit)? = null
+    private var onMoreListener: ((View, File) -> Unit)? = null
 
-    fun setOnOpenListener(listener: (BaseFile) -> Unit) {
+    fun setOnMoreListener(listener: (View, File) -> Unit) {
+        onMoreListener = listener
+    }
+
+    private var onOpenListener: ((File) -> Unit)? = null
+
+    fun setOnOpenListener(listener: (File) -> Unit) {
         onOpenListener = listener
     }
 }

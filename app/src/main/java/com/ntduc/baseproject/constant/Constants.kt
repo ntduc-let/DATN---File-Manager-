@@ -1,7 +1,7 @@
 package com.ntduc.baseproject.constant
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 
 const val BASE_URL = "http://45.79.147.162:1234/"

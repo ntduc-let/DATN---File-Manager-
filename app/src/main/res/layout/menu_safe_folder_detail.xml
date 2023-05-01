@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="200dp"
+    android:layout_width="250dp"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_menu"
     android:orientation="vertical"
     android:paddingVertical="8dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/share"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_medium"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="@string/share"
+            android:textColor="@color/monochrome_700"
+            android:textSize="16sp" />
+    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/delete"
@@ -24,24 +40,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/favorite"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/txt_favorite"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/inter_medium"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
-            android:text="@string/add_to_favorites"
-            android:textColor="@color/monochrome_700"
-            android:textSize="16sp" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/info"
+        android:id="@+id/move_out_of_safe_folder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -51,23 +50,7 @@
             android:fontFamily="@font/inter_medium"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp"
-            android:text="@string/file_info"
-            android:textColor="@color/monochrome_700"
-            android:textSize="16sp" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/move_to_safe_folder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/inter_medium"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
-            android:text="@string/move_to_safe_folder"
+            android:text="@string/move_out_of_safe_folder"
             android:textColor="@color/monochrome_700"
             android:textSize="16sp" />
     </com.google.android.material.card.MaterialCardView>

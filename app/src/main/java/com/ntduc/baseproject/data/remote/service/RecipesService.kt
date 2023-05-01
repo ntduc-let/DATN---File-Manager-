@@ -5,7 +5,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 
 interface RecipesService {

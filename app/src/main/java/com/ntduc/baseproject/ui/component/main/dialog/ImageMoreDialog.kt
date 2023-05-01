@@ -95,6 +95,13 @@ class ImageMoreDialog : BaseDialogFragment<DialogImageMoreBinding>(contentLayout
             }
             dismiss()
         }
+
+        binding.moveToSafeFolder.setOnClickListener {
+            onMoveSafeFolderListener?.let {
+                it(baseImage!!)
+            }
+            dismiss()
+        }
     }
 
     private var onRenameListener: ((BaseImage) -> Unit)? = null
@@ -107,6 +114,12 @@ class ImageMoreDialog : BaseDialogFragment<DialogImageMoreBinding>(contentLayout
 
     fun setOnInfoListener(listener: ((BaseImage) -> Unit)) {
         onInfoListener = listener
+    }
+
+    private var onMoveSafeFolderListener: ((BaseImage) -> Unit)? = null
+
+    fun setOnMoveSafeFolderListener(listener: ((BaseImage) -> Unit)) {
+        onMoveSafeFolderListener = listener
     }
 
     private fun addFavorite(image: BaseImage) {

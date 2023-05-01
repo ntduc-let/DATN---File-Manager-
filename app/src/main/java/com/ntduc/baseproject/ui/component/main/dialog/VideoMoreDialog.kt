@@ -5,6 +5,7 @@ import androidx.fragment.app.activityViewModels
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FAVORITE_VIDEO
 import com.ntduc.baseproject.constant.FileTypeExtension
+import com.ntduc.baseproject.data.dto.base.BaseImage
 import com.ntduc.baseproject.data.dto.base.BaseVideo
 import com.ntduc.baseproject.databinding.DialogImageMoreBinding
 import com.ntduc.baseproject.ui.base.BaseDialogFragment
@@ -95,6 +96,13 @@ class VideoMoreDialog : BaseDialogFragment<DialogImageMoreBinding>(contentLayout
             }
             dismiss()
         }
+
+        binding.moveToSafeFolder.setOnClickListener {
+            onMoveSafeFolderListener?.let {
+                it(baseVideo!!)
+            }
+            dismiss()
+        }
     }
 
     private var onRenameListener: ((BaseVideo) -> Unit)? = null
@@ -107,6 +115,12 @@ class VideoMoreDialog : BaseDialogFragment<DialogImageMoreBinding>(contentLayout
 
     fun setOnInfoListener(listener: ((BaseVideo) -> Unit)) {
         onInfoListener = listener
+    }
+
+    private var onMoveSafeFolderListener: ((BaseVideo) -> Unit)? = null
+
+    fun setOnMoveSafeFolderListener(listener: ((BaseVideo) -> Unit)) {
+        onMoveSafeFolderListener = listener
     }
 
     private fun addFavorite(video: BaseVideo) {

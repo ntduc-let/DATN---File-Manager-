@@ -1,6 +1,7 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home
 
 import android.os.Bundle
+import android.os.Environment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -20,6 +21,7 @@ import com.ntduc.baseproject.utils.view.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 
 class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorageBinding>(R.layout.fragment_detail_internal_storage) {
@@ -147,8 +149,14 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
             is Resource.Loading -> {}
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    var sizeUsed = 0L
+                    val listQuery = arrayListOf<BaseVideo>()
+
                     it.forEach {
+                        if (!it.data!!.startsWith(File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}").path)) listQuery.add(it)
+                    }
+
+                    var sizeUsed = 0L
+                    listQuery.forEach {
                         sizeUsed += it.size ?: 0
                     }
                     val availableInternalMemorySize = DeviceUtils.getAvailableInternalMemorySize().toDouble()
@@ -157,7 +165,7 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
                     val percentUsed = (sizeUsed.toDouble() / useSize) * 100
 
                     withContext(Dispatchers.Main) {
-                        binding.videos.description.text = "${it.size} items ∙ ${sizeUsed.formatBytes()}"
+                        binding.videos.description.text = "${listQuery.size} items ∙ ${sizeUsed.formatBytes()}"
                         binding.videos.progress.progress = percentUsed.toInt()
                     }
                 }
@@ -171,8 +179,14 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
             is Resource.Loading -> {}
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    var sizeUsed = 0L
+                    val listQuery = arrayListOf<BaseFile>()
+
                     it.forEach {
+                        if (!it.data!!.startsWith(File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}").path)) listQuery.add(it)
+                    }
+
+                    var sizeUsed = 0L
+                    listQuery.forEach {
                         sizeUsed += it.size ?: 0
                     }
                     val availableInternalMemorySize = DeviceUtils.getAvailableInternalMemorySize().toDouble()
@@ -181,7 +195,7 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
                     val percentUsed = (sizeUsed.toDouble() / useSize) * 100
 
                     withContext(Dispatchers.Main) {
-                        binding.document.description.text = "${it.size} items ∙ ${sizeUsed.formatBytes()}"
+                        binding.document.description.text = "${listQuery.size} items ∙ ${sizeUsed.formatBytes()}"
                         binding.document.progress.progress = percentUsed.toInt()
                     }
                 }
@@ -195,8 +209,14 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
             is Resource.Loading -> {}
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    var sizeUsed = 0L
+                    val listQuery = arrayListOf<BaseImage>()
+
                     it.forEach {
+                        if (!it.data!!.startsWith(File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}").path)) listQuery.add(it)
+                    }
+
+                    var sizeUsed = 0L
+                    listQuery.forEach {
                         sizeUsed += it.size ?: 0
                     }
                     val availableInternalMemorySize = DeviceUtils.getAvailableInternalMemorySize().toDouble()
@@ -205,7 +225,7 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
                     val percentUsed = (sizeUsed.toDouble() / useSize) * 100
 
                     withContext(Dispatchers.Main) {
-                        binding.images.description.text = "${it.size} items ∙ ${sizeUsed.formatBytes()}"
+                        binding.images.description.text = "${listQuery.size} items ∙ ${sizeUsed.formatBytes()}"
                         binding.images.progress.progress = percentUsed.toInt()
                     }
                 }
@@ -219,8 +239,14 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
             is Resource.Loading -> {}
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    var sizeUsed = 0L
+                    val listQuery = arrayListOf<BaseAudio>()
+
                     it.forEach {
+                        if (!it.data!!.startsWith(File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}").path)) listQuery.add(it)
+                    }
+
+                    var sizeUsed = 0L
+                    listQuery.forEach {
                         sizeUsed += it.size ?: 0
                     }
                     val availableInternalMemorySize = DeviceUtils.getAvailableInternalMemorySize().toDouble()
@@ -229,7 +255,7 @@ class DetailInternalStorageFragment : BaseFragment<FragmentDetailInternalStorage
                     val percentUsed = (sizeUsed.toDouble() / useSize) * 100
 
                     withContext(Dispatchers.Main) {
-                        binding.audio.description.text = "${it.size} items ∙ ${sizeUsed.formatBytes()}"
+                        binding.audio.description.text = "${listQuery.size} items ∙ ${sizeUsed.formatBytes()}"
                         binding.audio.progress.progress = percentUsed.toInt()
                     }
                 }

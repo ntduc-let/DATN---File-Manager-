@@ -1,7 +1,7 @@
 package com.ntduc.baseproject.data.error
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 
 class Error(val code: Int, val description: String) {

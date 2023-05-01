@@ -1,13 +1,23 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.image
 
 import android.os.Bundle
+import android.os.Environment
 import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.constant.*
+import com.ntduc.baseproject.constant.FAVORITE_IMAGE
+import com.ntduc.baseproject.constant.IS_FAVORITE
+import com.ntduc.baseproject.constant.KEY_BASE_FOLDER_IMAGE
+import com.ntduc.baseproject.constant.SORT_BY
+import com.ntduc.baseproject.constant.SORT_BY_DATE_NEW
+import com.ntduc.baseproject.constant.SORT_BY_DATE_OLD
+import com.ntduc.baseproject.constant.SORT_BY_NAME_A_Z
+import com.ntduc.baseproject.constant.SORT_BY_NAME_Z_A
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_LARGE
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_SMALL
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseFile
 import com.ntduc.baseproject.data.dto.base.BaseImage
@@ -125,17 +135,23 @@ class ListFolderImageFragment : BaseFragment<FragmentListAppBinding>(R.layout.fr
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val listQuery = arrayListOf<BaseImage>()
-                    if (isFavorite) {
-                        val listFavorite = Hawk.get(FAVORITE_IMAGE, arrayListOf<String>())
-                        it.forEach {
-                            if (listFavorite.contains(it.data)) listQuery.add(it)
-                        }
-                    } else {
-                        listQuery.addAll(it)
+                    val listQuery1 = arrayListOf<BaseImage>()
+
+                    it.forEach {
+                        if (!it.data!!.startsWith(File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}").path)) listQuery1.add(it)
                     }
 
-                    val temp = filterFolderFile(listQuery)
+                    val listQuery2 = arrayListOf<BaseImage>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_IMAGE, arrayListOf<String>())
+                        listQuery1.forEach {
+                            if (listFavorite.contains(it.data)) listQuery2.add(it)
+                        }
+                    } else {
+                        listQuery2.addAll(listQuery1)
+                    }
+
+                    val temp = filterFolderFile(listQuery2)
                     if (temp.isEmpty()) {
                         withContext(Dispatchers.Main) {
                             binding.rcv.gone()

@@ -1,13 +1,28 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.image
 
 import android.os.Bundle
+import android.os.Environment
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.constant.*
+import com.ntduc.baseproject.constant.DATE_HEAD
+import com.ntduc.baseproject.constant.FAVORITE_IMAGE
+import com.ntduc.baseproject.constant.IS_FAVORITE
+import com.ntduc.baseproject.constant.KEY_BASE_FOLDER_IMAGE
+import com.ntduc.baseproject.constant.KEY_BASE_IMAGE
+import com.ntduc.baseproject.constant.NAME_HEAD
+import com.ntduc.baseproject.constant.RECENT_FILE
+import com.ntduc.baseproject.constant.SIZE_HEAD
+import com.ntduc.baseproject.constant.SORT_BY
+import com.ntduc.baseproject.constant.SORT_BY_DATE_NEW
+import com.ntduc.baseproject.constant.SORT_BY_DATE_OLD
+import com.ntduc.baseproject.constant.SORT_BY_NAME_A_Z
+import com.ntduc.baseproject.constant.SORT_BY_NAME_Z_A
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_LARGE
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_SMALL
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseImage
 import com.ntduc.baseproject.data.dto.folder.FolderImageFile
@@ -16,11 +31,22 @@ import com.ntduc.baseproject.ui.adapter.ImageAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.ImageMoreDialog
+import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
+import com.ntduc.baseproject.ui.component.main.dialog.MoveSafeFolderDialog
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
-import com.ntduc.baseproject.utils.*
+import com.ntduc.baseproject.utils.BYTES_TO_GB
+import com.ntduc.baseproject.utils.BYTES_TO_MB
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
+import com.ntduc.baseproject.utils.currentMillis
+import com.ntduc.baseproject.utils.file.delete
 import com.ntduc.baseproject.utils.file.open
+import com.ntduc.baseproject.utils.getDateTimeFromMillis
+import com.ntduc.baseproject.utils.isAlphabetic
+import com.ntduc.baseproject.utils.navigateToDes
+import com.ntduc.baseproject.utils.observe
+import com.ntduc.baseproject.utils.security.FileEncryption
+import com.ntduc.baseproject.utils.toast.shortToast
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.ntduc.recyclerviewsticky.StickyHeadersGridLayoutManager
@@ -29,7 +55,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.*
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.util.Locale
 
 class ListImageInFolderFragment : BaseFragment<FragmentListImageInFolderBinding>(R.layout.fragment_list_image_in_folder) {
 
@@ -117,17 +145,23 @@ class ListImageInFolderFragment : BaseFragment<FragmentListImageInFolderBinding>
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val listQuery = arrayListOf<BaseImage>()
-                    if (isFavorite) {
-                        val listFavorite = Hawk.get(FAVORITE_IMAGE, arrayListOf<String>())
-                        it.forEach {
-                            if (listFavorite.contains(it.data)) listQuery.add(it)
-                        }
-                    } else {
-                        listQuery.addAll(it)
+                    val listQuery1 = arrayListOf<BaseImage>()
+
+                    it.forEach {
+                        if (!it.data!!.startsWith(File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}").path)) listQuery1.add(it)
                     }
 
-                    val list = listQuery.filter { File(it.data!!).parent == folderImageFile!!.baseFile!!.data }
+                    val listQuery2 = arrayListOf<BaseImage>()
+                    if (isFavorite) {
+                        val listFavorite = Hawk.get(FAVORITE_IMAGE, arrayListOf<String>())
+                        listQuery1.forEach {
+                            if (listFavorite.contains(it.data)) listQuery2.add(it)
+                        }
+                    } else {
+                        listQuery2.addAll(listQuery1)
+                    }
+
+                    val list = listQuery2.filter { File(it.data!!).parent == folderImageFile!!.baseFile!!.data }
 
                     withContext(Dispatchers.Main) {
                         if (list.isEmpty()) {
@@ -198,6 +232,34 @@ class ListImageInFolderFragment : BaseFragment<FragmentListImageInFolderBinding>
             val bundle = Bundle()
             bundle.putParcelable(KEY_BASE_IMAGE, baseImage)
             navigateToDes(R.id.imageDetailFragment, bundle)
+        }
+        dialogMore.setOnMoveSafeFolderListener {
+            val dialogSafeFolder = MoveSafeFolderDialog.newInstance(it)
+            dialogSafeFolder.setOnMoveListener { baseFileEncryption, pin ->
+                val dialogLoading = LoadingEncryptionDialog()
+                dialogLoading.show(childFragmentManager, "LoadingEncryptionDialog")
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val folder = File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}/.SafeFolder/image")
+                    if (!folder.exists()) {
+                        folder.mkdirs()
+                    }
+                    FileEncryption.encryptToFile(
+                        "$pin$pin$pin$pin",
+                        "abcdefghptreqwrf",
+                        FileInputStream(File(baseFileEncryption.data!!)),
+                        FileOutputStream(File("${folder.path}/${baseFileEncryption.displayName}"))
+                    )
+
+                    File(baseFileEncryption.data!!).delete(requireContext())
+
+                    withContext(Dispatchers.Main) {
+                        shortToast("Chuyển đổi thành công")
+                        dialogLoading.dismiss()
+                        viewModel.requestAllImages()
+                    }
+                }
+            }
+            dialogSafeFolder.show(childFragmentManager, "MoveSafeFolderDialog")
         }
         dialogMore.show(childFragmentManager, "ImageMoreDialog")
     }

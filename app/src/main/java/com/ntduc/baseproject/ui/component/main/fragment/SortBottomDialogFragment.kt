@@ -106,6 +106,11 @@ class SortBottomDialogFragment : BaseBottomSheetDialogFragment<DialogSortBinding
         viewModel.requestAllAudio()
         viewModel.requestAllImages()
         viewModel.requestAllVideos()
+        viewModel.loadApkSafe(requireContext())
+        viewModel.loadAudioSafe(requireContext())
+        viewModel.loadDocumentSafe(requireContext())
+        viewModel.loadImageSafe(requireContext())
+        viewModel.loadVideoSafe(requireContext())
         onSortListener?.let {
             it()
         }

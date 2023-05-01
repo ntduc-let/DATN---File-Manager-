@@ -5,7 +5,7 @@ import com.ntduc.baseproject.data.error.mapper.ErrorMapper
 import javax.inject.Inject
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 
 class ErrorManager @Inject constructor(private val errorMapper: ErrorMapper) : ErrorUseCase {

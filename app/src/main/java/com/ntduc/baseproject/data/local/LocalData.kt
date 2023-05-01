@@ -26,7 +26,7 @@ import java.util.ArrayList
 import javax.inject.Inject
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 
 class LocalData @Inject constructor(val context: Context) {
@@ -97,7 +97,7 @@ class LocalData @Inject constructor(val context: Context) {
                 it.delete(context)
             }
         }
-        apkCacheFolder.listFiles()?.forEach {
+        apkFolder.listFiles()?.forEach {
             val outputFile = File(apkCacheFolder.path + "/${it.name}")
             FileEncryption.decryptToFile(
                 "$pass$pass$pass$pass",
@@ -127,7 +127,7 @@ class LocalData @Inject constructor(val context: Context) {
                 it.delete(context)
             }
         }
-        videoCacheFolder.listFiles()?.forEach {
+        videoFolder.listFiles()?.forEach {
             val outputFile = File(videoCacheFolder.path + "/${it.name}")
             FileEncryption.decryptToFile(
                 "$pass$pass$pass$pass",
@@ -157,7 +157,7 @@ class LocalData @Inject constructor(val context: Context) {
                 it.delete(context)
             }
         }
-        documentCacheFolder.listFiles()?.forEach {
+        documentFolder.listFiles()?.forEach {
             val outputFile = File(documentCacheFolder.path + "/${it.name}")
             FileEncryption.decryptToFile(
                 "$pass$pass$pass$pass",
@@ -187,7 +187,7 @@ class LocalData @Inject constructor(val context: Context) {
                 it.delete(context)
             }
         }
-        imageCacheFolder.listFiles()?.forEach {
+        imageFolder.listFiles()?.forEach {
             val outputFile = File(imageCacheFolder.path + "/${it.name}")
             FileEncryption.decryptToFile(
                 "$pass$pass$pass$pass",
@@ -217,7 +217,7 @@ class LocalData @Inject constructor(val context: Context) {
                 it.delete(context)
             }
         }
-        audioCacheFolder.listFiles()?.forEach {
+        audioFolder.listFiles()?.forEach {
             val outputFile = File(audioCacheFolder.path + "/${it.name}")
             FileEncryption.decryptToFile(
                 "$pass$pass$pass$pass",

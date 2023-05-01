@@ -96,4 +96,24 @@
         android:id="@+id/homeSafeFragment"
         android:name="com.ntduc.baseproject.ui.component.main.fragment.security.HomeSafeFragment"
         android:label="HomeSafeFragment" />
+    <fragment
+        android:id="@+id/listApkSafeFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.security.list.ListApkSafeFragment"
+        android:label="ListApkSafeFragment" />
+    <fragment
+        android:id="@+id/listAudioSafeFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.security.list.ListAudioSafeFragment"
+        android:label="ListAudioSafeFragment" />
+    <fragment
+        android:id="@+id/documentSafeFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.security.list.document.DocumentSafeFragment"
+        android:label="DocumentSafeFragment" />
+    <fragment
+        android:id="@+id/listImageSafeFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.security.list.ListImageSafeFragment"
+        android:label="ListImageSafeFragment" />
+    <fragment
+        android:id="@+id/listVideoSafeFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.security.list.ListVideoSafeFragment"
+        android:label="ListVideoSafeFragment" />
 </navigation>

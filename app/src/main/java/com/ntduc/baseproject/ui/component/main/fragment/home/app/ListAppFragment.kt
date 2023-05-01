@@ -5,7 +5,6 @@ import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*

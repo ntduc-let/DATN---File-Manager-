@@ -1,6 +1,7 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.document
 
 import android.os.Bundle
+import android.os.Environment
 import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.activityViewModels
@@ -16,6 +17,8 @@ import com.ntduc.baseproject.ui.adapter.DocumentAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.BasePopupWindow
+import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
+import com.ntduc.baseproject.ui.component.main.dialog.MoveSafeFolderDialog
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.activity.getStatusBarHeight
@@ -23,6 +26,8 @@ import com.ntduc.baseproject.utils.context.displayHeight
 import com.ntduc.baseproject.utils.file.delete
 import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.file.share
+import com.ntduc.baseproject.utils.security.FileEncryption
+import com.ntduc.baseproject.utils.toast.shortToast
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.orhanobut.hawk.Hawk
@@ -30,6 +35,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragment_list_app) {
 
@@ -160,6 +167,37 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
             popupWindow.dismiss()
         }
 
+        popupBinding.moveToSafeFolder.setOnClickListener {
+            popupWindow.dismiss()
+
+            val dialogSafeFolder = MoveSafeFolderDialog.newInstance(baseFile)
+            dialogSafeFolder.setOnMoveListener { baseFileEncryption, pin ->
+                val dialogLoading = LoadingEncryptionDialog()
+                dialogLoading.show(childFragmentManager, "LoadingEncryptionDialog")
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val folder = File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}/.SafeFolder/document")
+                    if (!folder.exists()) {
+                        folder.mkdirs()
+                    }
+                    FileEncryption.encryptToFile(
+                        "$pin$pin$pin$pin",
+                        "abcdefghptreqwrf",
+                        FileInputStream(File(baseFileEncryption.data!!)),
+                        FileOutputStream(File("${folder.path}/${baseFileEncryption.displayName}"))
+                    )
+
+                    File(baseFileEncryption.data!!).delete(requireContext())
+
+                    withContext(Dispatchers.Main) {
+                        shortToast("Chuyển đổi thành công")
+                        dialogLoading.dismiss()
+                        viewModel.requestAllDocument()
+                    }
+                }
+            }
+            dialogSafeFolder.show(childFragmentManager, "MoveSafeFolderDialog")
+        }
+
         popupWindow.showAtLocation(view, Gravity.TOP or Gravity.END, 8.dp, view.y.toInt() + (requireActivity().displayHeight - binding.root.height) + requireActivity().getStatusBarHeight)
     }
 
@@ -214,24 +252,30 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val listQuery = arrayListOf<BaseFile>()
+                    val listQuery1 = arrayListOf<BaseFile>()
+
+                    it.forEach {
+                        if (!it.data!!.startsWith(File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}").path)) listQuery1.add(it)
+                    }
+
+                    val listQuery2 = arrayListOf<BaseFile>()
                     if (isFavorite) {
                         val listFavorite = Hawk.get(FAVORITE_DOCUMENT, arrayListOf<String>())
-                        it.forEach {
-                            if (listFavorite.contains(it.data)) listQuery.add(it)
+                        listQuery1.forEach {
+                            if (listFavorite.contains(it.data)) listQuery2.add(it)
                         }
                     } else {
-                        listQuery.addAll(it)
+                        listQuery2.addAll(listQuery1)
                     }
 
                     val list: List<BaseFile> = when (type) {
-                        TYPE_ALL -> listQuery
-                        TYPE_PDF -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PDF }
-                        TYPE_TXT -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.TXT }
-                        TYPE_DOC -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.DOC }
-                        TYPE_XLS -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.XLS }
-                        TYPE_PPT -> listQuery.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PPT }
-                        else -> listQuery
+                        TYPE_ALL -> listQuery2
+                        TYPE_PDF -> listQuery2.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PDF }
+                        TYPE_TXT -> listQuery2.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.TXT }
+                        TYPE_DOC -> listQuery2.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.DOC }
+                        TYPE_XLS -> listQuery2.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.XLS }
+                        TYPE_PPT -> listQuery2.filter { item -> FileTypeExtension.getTypeFile(item.data!!) == FileTypeExtension.PPT }
+                        else -> listQuery2
                     }
 
                     if (list.isEmpty()) {

@@ -5,7 +5,7 @@ import com.ntduc.baseproject.data.dto.frames.DataFrames
 import com.ntduc.baseproject.data.dto.recipes.Recipes
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 
 internal interface RemoteDataSource {

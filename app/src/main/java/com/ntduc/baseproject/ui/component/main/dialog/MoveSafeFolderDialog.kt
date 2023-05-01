@@ -1,19 +1,21 @@
-package com.ntduc.baseproject.ui.component.main.fragment
+package com.ntduc.baseproject.ui.component.main.dialog
 
+import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Base64
-import androidx.fragment.app.activityViewModels
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.databinding.FragmentSecurityBinding
-import com.ntduc.baseproject.ui.base.BaseFragment
-import com.ntduc.baseproject.ui.component.main.MainViewModel
+import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.databinding.DialogMoveSafeFolderBinding
+import com.ntduc.baseproject.databinding.DialogRenameBinding
+import com.ntduc.baseproject.ui.base.BaseDialogFragment
 import com.ntduc.baseproject.ui.component.main.fragment.security.textwatcher.GenericKeyEvent
 import com.ntduc.baseproject.ui.component.main.fragment.security.textwatcher.GenericTextWatcher
 import com.ntduc.baseproject.utils.activity.hideKeyboard
 import com.ntduc.baseproject.utils.activity.showKeyboard
 import com.ntduc.baseproject.utils.file.readToString
+import com.ntduc.baseproject.utils.file.renameTo
 import com.ntduc.baseproject.utils.file.writeToFile
 import com.ntduc.baseproject.utils.navigateToDes
 import com.ntduc.baseproject.utils.toast.shortToast
@@ -21,12 +23,27 @@ import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import java.io.File
 
-class SecurityFragment : BaseFragment<FragmentSecurityBinding>(R.layout.fragment_security) {
+class MoveSafeFolderDialog : BaseDialogFragment<DialogMoveSafeFolderBinding>(R.layout.dialog_move_safe_folder, isCanceledOnTouchOutside = true) {
 
-    private val viewModel: MainViewModel by activityViewModels()
+    companion object {
+        private const val DATA = "DATA"
+
+        fun newInstance(baseFile: BaseFile): MoveSafeFolderDialog {
+            val args = Bundle()
+            args.putParcelable(DATA, baseFile)
+
+            val fragment = MoveSafeFolderDialog()
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    private var baseFile: BaseFile? = null
 
     override fun initView() {
         super.initView()
+
+        baseFile = requireArguments().getParcelable(DATA)
 
         showKeyboard(binding.otpET1)
         checkNullEdt()
@@ -48,9 +65,11 @@ class SecurityFragment : BaseFragment<FragmentSecurityBinding>(R.layout.fragment
             if (isPasswordVerificationSuccessful(pin)) {
                 clearTextPass()
 
-                shortToast("Đăng nhập thành công")
+                onMoveListener?.let {
+                    it(baseFile!!, pin)
+                }
 
-                navigateToDes(R.id.homeSafeFragment)
+                dismiss()
             } else {
                 shortToast("Mật khẩu không chính xác. Hãy thử lại!")
             }
@@ -63,9 +82,11 @@ class SecurityFragment : BaseFragment<FragmentSecurityBinding>(R.layout.fragment
                 clearTextPass()
                 savePass(pin)
 
-                shortToast("Tạo thư mục bảo mật thành công")
+                onMoveListener?.let {
+                    it(baseFile!!, pin)
+                }
 
-                navigateToDes(R.id.homeSafeFragment)
+                dismiss()
             } else {
                 shortToast("Mật khẩu phải đủ 6 chữ số. Hãy thử lại!")
             }
@@ -155,5 +176,11 @@ class SecurityFragment : BaseFragment<FragmentSecurityBinding>(R.layout.fragment
         val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
         val pass = String(bytes, Charsets.UTF_8)
         return pin == pass
+    }
+
+    private var onMoveListener: ((BaseFile, String) -> Unit)? = null
+
+    fun setOnMoveListener(listener: ((BaseFile, String) -> Unit)) {
+        onMoveListener = listener
     }
 }

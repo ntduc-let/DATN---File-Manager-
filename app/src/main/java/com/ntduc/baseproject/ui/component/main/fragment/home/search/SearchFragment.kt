@@ -14,7 +14,6 @@ import com.ntduc.baseproject.ui.adapter.SearchAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
-import com.ntduc.baseproject.ui.component.main.fragment.home.document.ListDocumentFragment
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.observe

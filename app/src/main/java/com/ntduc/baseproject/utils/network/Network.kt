@@ -7,7 +7,7 @@ import android.net.NetworkInfo
 import javax.inject.Inject
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 
 /*

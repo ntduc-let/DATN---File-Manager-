@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 
 /**
- * Created by TruyenIT
+ * Created by DucNT
  */
 
 class RemoteData @Inject
