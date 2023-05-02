@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="black3">#FF263445</color>
+    <color name="black2">#1E2D3E</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white1">#FFC0CCDA</color>
+    <color name="colorBarrier">#C0CCDA</color>
+    <color name="pdf">#30EA4C3A</color>
+    <color name="ppt">#66ED1C24</color>
+    <color name="csv">#66BF6149</color>
+    <color name="all">#420720F3</color>
+    <color name="xls">#4208743B</color>
+    <color name="blue">#0A1BAC</color>
+    <color name="green">#13CE66</color>
+
+    <color name="black">#000000</color>
+
+</resources>

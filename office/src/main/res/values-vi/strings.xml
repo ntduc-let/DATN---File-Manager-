@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sys_button_ok">Đã hiểu</string>
+    <string name="sys_button_cancel">Hủy</string>
+    <string name="sys_progress_message_loading">Đang tải, vui lòng đợi…</string>
+
+    <string name="dialog_error_title">Lỗi</string>
+    <string name="dialog_insufficient_memory">Xin lỗi. Chúng tôi không thể hoàn thành tác vụ vì sự cố bộ nhớ</string>
+    <string name="dialog_system_crash_error">Xin lỗi. Hệ thông gián đoạn. Vui lòng thử lại sau</string>
+    <string name="dialog_format_error">Xin lỗi. Chúng tôi không thể mở định dạng tập tin này</string>
+    <string name="dialog_old_document">Xin lỗi. Định dạng tập tin cũ hơn Office 95. Chúng tôi không hỗ trợ</string>
+    <string name="dialog_parse_error">Xin lỗi. Chúng tôi không thể mở tập tin này vì lỗi giải mã</string>
+    <string name="dialog_rtf_file">Xin lỗi. Chúng tôi không thể mở tập tin RTF</string>
+    <string name="dialog_cannot_encrypted_file">Xin lỗi. Chúng tôi không thể mở tập tin đã đặt mật khẩu</string>
+
+    <string name="share_title">Chia sẻ tập tin</string>
+    <string name="upload_title">Tải lên tập tin</string>
+    <string name="jump_title">Nhảy tới trang</string>
+    <string name="print_title">In tập tin</string>
+</resources>

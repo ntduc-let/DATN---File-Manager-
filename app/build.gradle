@@ -72,6 +72,7 @@ dependencies {
     implementation project(path: ':RecyclerViewSticky')
     implementation project(path: ':ViewPager2Transformer')
     implementation project(path: ':circularprogressbar')
+    implementation project(path: ':office')
 
     //Hilt
     def hiltVersion = "2.44.2"
