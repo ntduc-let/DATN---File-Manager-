@@ -34,7 +34,6 @@
         <item name="materialButtonStyle">@style/Widget.AppCompat.Button.ButtonBar.AlertDialog</item>
         <item name="android:statusBarColor">?attr/base_color</item>
         <item name="base_color">@color/blue_main</item>
-
         <item name="colorControlHighlight">?attr/base_color</item>
         <item name="titleTextColor">@color/white</item>
     </style>
@@ -50,5 +49,8 @@
     </style>
     <style name="XLS" parent="MainFullScreen">
         <item name="base_color">@color/xls_color</item>
+    </style>
+    <style name="TXT" parent="MainFullScreen">
+        <item name="base_color">@color/txt_color</item>
     </style>
 </resources>

@@ -14,6 +14,7 @@ import com.ntduc.baseproject.ui.adapter.SearchAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
+import com.ntduc.baseproject.ui.component.office.OfficeReaderActivity
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.observe
@@ -57,7 +58,14 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
         }
 
         searchAdapter.setOnOpenListener {
-            File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            when(FileTypeExtension.getTypeFile(it.data!!)){
+                FileTypeExtension.DOC, FileTypeExtension.XLS, FileTypeExtension.PPT, FileTypeExtension.PDF, FileTypeExtension.TXT -> {
+                    OfficeReaderActivity.openFile(requireContext(), it)
+                }
+                else -> {
+                    File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+                }
+            }
             updateRecent(it)
         }
 

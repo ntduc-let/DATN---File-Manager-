@@ -5,6 +5,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
+import com.ntduc.baseproject.constant.FileTypeExtension
 import com.ntduc.baseproject.constant.IS_FAVORITE
 import com.ntduc.baseproject.constant.RECENT_FILE
 import com.ntduc.baseproject.data.Resource
@@ -13,6 +14,7 @@ import com.ntduc.baseproject.databinding.FragmentHomeBinding
 import com.ntduc.baseproject.ui.adapter.RecentFilesAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
+import com.ntduc.baseproject.ui.component.office.OfficeReaderActivity
 import com.ntduc.baseproject.utils.DeviceUtils
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.file.open
@@ -89,7 +91,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         super.addEvent()
 
         recentFilesAdapter.setOnOpenListener {
-            File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            when(FileTypeExtension.getTypeFile(it.data!!)){
+                FileTypeExtension.DOC, FileTypeExtension.XLS, FileTypeExtension.PPT, FileTypeExtension.PDF, FileTypeExtension.TXT -> {
+                    OfficeReaderActivity.openFile(requireContext(), it)
+                }
+                else -> {
+                    File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+                }
+            }
             updateRecent(it)
         }
 

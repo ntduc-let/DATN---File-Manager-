@@ -9,7 +9,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -60,10 +59,6 @@ class OfficeReaderActivity : BaseActivity<ActivityOfficeDetailBinding>(ROffice.l
     private lateinit var documentType: String
 
     private fun changeStatusBarColor(colorResourceId: Int) {
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-        )
-
         window.statusBarColor = ContextCompat.getColor(this, colorResourceId)
     }
 
@@ -81,12 +76,13 @@ class OfficeReaderActivity : BaseActivity<ActivityOfficeDetailBinding>(ROffice.l
                     FileTypeExtension.DOC -> R.style.DOC
                     FileTypeExtension.PPT -> R.style.PPT
                     FileTypeExtension.PDF -> R.style.PDF
+                    FileTypeExtension.TXT -> R.style.TXT
                     else -> R.style.MainFullScreen
                 }
             )
         }
 
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS)
+        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS)
         super.onCreate(savedInstanceState)
     }
 
@@ -333,7 +329,8 @@ class OfficeReaderActivity : BaseActivity<ActivityOfficeDetailBinding>(ROffice.l
             FileTypeExtension.XLS -> R.color.xls_color
             FileTypeExtension.PPT -> R.color.ppt_color
             FileTypeExtension.PDF -> R.color.pdf_color
-            else -> ROffice.color.green
+            FileTypeExtension.TXT -> R.color.txt_color
+            else -> R.color.blue_main
         }
         changeStatusBarColor(colorResourceId)
         binding.toolbarOffice.setBackgroundResource(colorResourceId)
@@ -374,7 +371,7 @@ class OfficeReaderActivity : BaseActivity<ActivityOfficeDetailBinding>(ROffice.l
      * false: not show message when zooming
      */
     override fun isShowZoomingMsg(): Boolean {
-        return true
+        return false
     }
 
     /**

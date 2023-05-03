@@ -17,18 +17,21 @@ import com.ntduc.baseproject.constant.SORT_BY_NAME_Z_A
 import com.ntduc.baseproject.constant.SORT_BY_SIZE_LARGE
 import com.ntduc.baseproject.constant.SORT_BY_SIZE_SMALL
 import com.ntduc.baseproject.data.Resource
+import com.ntduc.baseproject.data.dto.base.BaseFile
 import com.ntduc.baseproject.databinding.FragmentListAppBinding
 import com.ntduc.baseproject.databinding.MenuSafeFolderDetailBinding
 import com.ntduc.baseproject.ui.adapter.FileSafeFolderAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
+import com.ntduc.baseproject.ui.component.office.OfficeReaderActivity
 import com.ntduc.baseproject.utils.activity.getStatusBarHeight
 import com.ntduc.baseproject.utils.context.displayHeight
+import com.ntduc.baseproject.utils.currentMillis
 import com.ntduc.baseproject.utils.dp
 import com.ntduc.baseproject.utils.file.delete
+import com.ntduc.baseproject.utils.file.mimeType
 import com.ntduc.baseproject.utils.file.moveTo
-import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.file.share
 import com.ntduc.baseproject.utils.observe
 import com.ntduc.baseproject.utils.toast.shortToast
@@ -82,7 +85,7 @@ class ListDocumentSafeFragment : BaseFragment<FragmentListAppBinding>(R.layout.f
         super.addEvent()
 
         fileSafeFolderAdapter.setOnOpenListener {
-            it.open(requireContext(), "${requireContext().packageName}.provider")
+            OfficeReaderActivity.openFile(requireContext(), BaseFile(id = currentMillis, title = it.nameWithoutExtension, displayName = it.name, mimeType = it.mimeType(), size = it.length(), dateAdded = it.lastModified(), dateModified = it.lastModified(), data = it.path))
         }
 
         fileSafeFolderAdapter.setOnMoreListener { view, file ->
