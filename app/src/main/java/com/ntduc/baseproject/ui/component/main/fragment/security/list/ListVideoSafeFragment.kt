@@ -73,7 +73,7 @@ class ListVideoSafeFragment : BaseFragment<FragmentListVideoSafeBinding>(R.layou
             dialog.show(childFragmentManager, "SortDialog")
         }
 
-        fileSafeFolderAdapter.setOnOpenListener {
+        fileSafeFolderAdapter.setOnOpenListener { it, list ->
             val intent = Intent(requireContext(), PlayerActivity::class.java)
             intent.setDataAndType(it.path.toUri(), it.mimeType())
             startActivity(intent)
