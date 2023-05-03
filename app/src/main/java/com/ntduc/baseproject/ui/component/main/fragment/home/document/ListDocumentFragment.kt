@@ -20,6 +20,7 @@ import com.ntduc.baseproject.ui.component.main.dialog.BasePopupWindow
 import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
 import com.ntduc.baseproject.ui.component.main.dialog.MoveSafeFolderDialog
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
+import com.ntduc.baseproject.ui.component.office.OfficeReaderActivity
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.activity.getStatusBarHeight
 import com.ntduc.baseproject.utils.context.displayHeight
@@ -83,7 +84,7 @@ class ListDocumentFragment : BaseFragment<FragmentListAppBinding>(R.layout.fragm
         super.addEvent()
 
         documentAdapter.setOnOpenListener {
-            File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            OfficeReaderActivity.openFile(requireContext(), it)
             updateRecent(it)
         }
 

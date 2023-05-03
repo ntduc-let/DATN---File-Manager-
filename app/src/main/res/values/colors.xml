@@ -16,4 +16,9 @@
     <color name="monochrome_700">#374151</color>
     <color name="blue_second">#DFF0FD</color>
     <color name="blue_third">#A4CDF8</color>
+
+    <color name="pdf_color">#E03303</color>
+    <color name="ppt_color">#FF671B</color>
+    <color name="doc_color">#006AB9</color>
+    <color name="xls_color">#0F8537</color>
 </resources>

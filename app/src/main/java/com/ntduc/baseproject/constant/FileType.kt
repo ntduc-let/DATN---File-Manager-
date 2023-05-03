@@ -69,7 +69,7 @@ object FileType {
   )
   
   val DOCUMENT_XLS = arrayOf(
-    "xls", "xlsx"
+    "xls", "xlsx", "csv"
   )
   
   val DOCUMENT_PPT = arrayOf(

@@ -25,4 +25,30 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+
+    <style name="MainFullScreen" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">?attr/base_color</item>
+        <item name="colorPrimaryDark">?attr/base_color</item>
+        <item name="colorAccent">?attr/base_color</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="materialButtonStyle">@style/Widget.AppCompat.Button.ButtonBar.AlertDialog</item>
+        <item name="android:statusBarColor">?attr/base_color</item>
+        <item name="base_color">@color/blue_main</item>
+
+        <item name="colorControlHighlight">?attr/base_color</item>
+        <item name="titleTextColor">@color/white</item>
+    </style>
+
+    <style name="PDF" parent="MainFullScreen">
+        <item name="base_color">@color/pdf_color</item>
+    </style>
+    <style name="DOC" parent="MainFullScreen">
+        <item name="base_color">@color/doc_color</item>
+    </style>
+    <style name="PPT" parent="MainFullScreen">
+        <item name="base_color">@color/ppt_color</item>
+    </style>
+    <style name="XLS" parent="MainFullScreen">
+        <item name="base_color">@color/xls_color</item>
+    </style>
 </resources>
