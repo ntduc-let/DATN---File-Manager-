@@ -11,9 +11,12 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/RecyclerViewSticky" />
+            <option value="$PROJECT_DIR$/VideoPlayer" />
             <option value="$PROJECT_DIR$/ViewPager2Transformer" />
+            <option value="$PROJECT_DIR$/android-file-chooser" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/circularprogressbar" />
+            <option value="$PROJECT_DIR$/doubletapplayerview" />
             <option value="$PROJECT_DIR$/office" />
             <option value="$PROJECT_DIR$/polygonimageview" />
           </set>

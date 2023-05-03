@@ -1,12 +1,15 @@
 package com.ntduc.baseproject.ui.component.main.fragment.security.list
 
+import android.content.Intent
 import android.os.Environment
 import android.view.Gravity
 import android.view.View
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.brouken.player.PlayerActivity
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.SORT_BY
 import com.ntduc.baseproject.constant.SORT_BY_DATE_NEW
@@ -29,6 +32,7 @@ import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.context.displayHeight
 import com.ntduc.baseproject.utils.dp
 import com.ntduc.baseproject.utils.file.delete
+import com.ntduc.baseproject.utils.file.mimeType
 import com.ntduc.baseproject.utils.file.moveTo
 import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.file.share
@@ -69,8 +73,10 @@ class ListVideoSafeFragment : BaseFragment<FragmentListVideoSafeBinding>(R.layou
             dialog.show(childFragmentManager, "SortDialog")
         }
 
-        fileSafeFolderAdapter.setOnOpenListener { it, list ->
-            it.open(requireContext(), "${requireContext().packageName}.provider")
+        fileSafeFolderAdapter.setOnOpenListener {
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
+            intent.setDataAndType(it.path.toUri(), it.mimeType())
+            startActivity(intent)
         }
 
         fileSafeFolderAdapter.setOnMoreListener { view, file ->
