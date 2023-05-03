@@ -84,7 +84,7 @@ class ListDocumentSafeFragment : BaseFragment<FragmentListAppBinding>(R.layout.f
     override fun addEvent() {
         super.addEvent()
 
-        fileSafeFolderAdapter.setOnOpenListener {
+        fileSafeFolderAdapter.setOnOpenListener { it, list ->
             OfficeReaderActivity.openFile(requireContext(), BaseFile(id = currentMillis, title = it.nameWithoutExtension, displayName = it.name, mimeType = it.mimeType(), size = it.length(), dateAdded = it.lastModified(), dateModified = it.lastModified(), data = it.path))
         }
 

@@ -16,21 +16,24 @@ import com.ntduc.baseproject.constant.SORT_BY_NAME_Z_A
 import com.ntduc.baseproject.constant.SORT_BY_SIZE_LARGE
 import com.ntduc.baseproject.constant.SORT_BY_SIZE_SMALL
 import com.ntduc.baseproject.data.Resource
+import com.ntduc.baseproject.data.dto.base.BaseImage
 import com.ntduc.baseproject.databinding.FragmentListImageSafeBinding
 import com.ntduc.baseproject.databinding.MenuSafeFolderDetailBinding
 import com.ntduc.baseproject.ui.adapter.FileSafeFolderAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.base.BasePopupWindow
+import com.ntduc.baseproject.ui.component.image.ImageViewerActivity
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
 import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
 import com.ntduc.baseproject.utils.activity.getStatusBarHeight
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.context.displayHeight
+import com.ntduc.baseproject.utils.currentMillis
 import com.ntduc.baseproject.utils.dp
 import com.ntduc.baseproject.utils.file.delete
+import com.ntduc.baseproject.utils.file.mimeType
 import com.ntduc.baseproject.utils.file.moveTo
-import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.file.share
 import com.ntduc.baseproject.utils.observe
 import com.ntduc.baseproject.utils.toast.shortToast
@@ -69,8 +72,15 @@ class ListImageSafeFragment : BaseFragment<FragmentListImageSafeBinding>(R.layou
             dialog.show(childFragmentManager, "SortDialog")
         }
 
-        fileSafeFolderAdapter.setOnOpenListener {
-            it.open(requireContext(), "${requireContext().packageName}.provider")
+        fileSafeFolderAdapter.setOnOpenListener { it, list ->
+            val listImage = arrayListOf<BaseImage>()
+            val currentImage = BaseImage(id = currentMillis, title = it.nameWithoutExtension, displayName = it.name, mimeType = it.mimeType(), size = it.length(), dateAdded = it.lastModified(), dateModified = it.lastModified(), data = it.path, height = null, width = null)
+            var currentPosition = 0
+            list.indices.forEach {
+                listImage.add(BaseImage(id = currentMillis, title = list[it].nameWithoutExtension, displayName = list[it].name, mimeType = list[it].mimeType(), size = list[it].length(), dateAdded = list[it].lastModified(), dateModified = list[it].lastModified(), data = list[it].path, height = null, width = null))
+                if (list[it].path == currentImage.data) currentPosition = it
+            }
+            ImageViewerActivity.openFile(requireContext(), listImage, currentPosition)
         }
 
         fileSafeFolderAdapter.setOnMoreListener { view, baseImage ->

@@ -26,6 +26,7 @@ import com.ntduc.baseproject.data.dto.base.BaseImage
 import com.ntduc.baseproject.databinding.FragmentListImageBinding
 import com.ntduc.baseproject.ui.adapter.ImageAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
+import com.ntduc.baseproject.ui.component.image.ImageViewerActivity
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.ImageMoreDialog
 import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
@@ -35,7 +36,6 @@ import com.ntduc.baseproject.utils.BYTES_TO_GB
 import com.ntduc.baseproject.utils.BYTES_TO_MB
 import com.ntduc.baseproject.utils.currentMillis
 import com.ntduc.baseproject.utils.file.delete
-import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.getDateTimeFromMillis
 import com.ntduc.baseproject.utils.isAlphabetic
 import com.ntduc.baseproject.utils.navigateToDes
@@ -91,9 +91,16 @@ class ListImageFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragme
     override fun addEvent() {
         super.addEvent()
 
-        imageAdapter.setOnOpenListener {
-            File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
-            updateRecent(it)
+        imageAdapter.setOnOpenListener { currentImage, listImage ->
+            run forList@{
+                listImage.indices.forEach {
+                    if (listImage[it].data == currentImage.data) {
+                        ImageViewerActivity.openFile(requireContext(), listImage, it)
+                        updateRecent(currentImage)
+                        return@forList
+                    }
+                }
+            }
         }
 
         imageAdapter.setOnMoreListener { view, baseImage ->

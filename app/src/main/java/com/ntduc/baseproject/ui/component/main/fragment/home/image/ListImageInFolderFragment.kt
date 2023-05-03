@@ -29,6 +29,7 @@ import com.ntduc.baseproject.data.dto.folder.FolderImageFile
 import com.ntduc.baseproject.databinding.FragmentListImageInFolderBinding
 import com.ntduc.baseproject.ui.adapter.ImageAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
+import com.ntduc.baseproject.ui.component.image.ImageViewerActivity
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.dialog.ImageMoreDialog
 import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
@@ -103,9 +104,16 @@ class ListImageInFolderFragment : BaseFragment<FragmentListImageInFolderBinding>
             dialog.show(childFragmentManager, "SortDialog")
         }
 
-        imageAdapter.setOnOpenListener {
-            File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
-            updateRecent(it)
+        imageAdapter.setOnOpenListener { currentImage, listImage ->
+            run forList@{
+                listImage.indices.forEach {
+                    if (listImage[it].data == currentImage.data) {
+                        ImageViewerActivity.openFile(requireContext(), listImage, it)
+                        updateRecent(currentImage)
+                        return@forList
+                    }
+                }
+            }
         }
 
         imageAdapter.setOnMoreListener { view, baseImage ->

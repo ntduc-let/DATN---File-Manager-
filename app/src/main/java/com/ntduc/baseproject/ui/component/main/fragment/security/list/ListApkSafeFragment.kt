@@ -69,7 +69,7 @@ class ListApkSafeFragment : BaseFragment<FragmentListApkSafeBinding>(R.layout.fr
             dialog.show(childFragmentManager, "SortDialog")
         }
 
-        fileSafeFolderAdapter.setOnOpenListener {
+        fileSafeFolderAdapter.setOnOpenListener { it, list ->
             requireActivity().installApk(it.path, "${requireContext().packageName}.provider")
         }
 

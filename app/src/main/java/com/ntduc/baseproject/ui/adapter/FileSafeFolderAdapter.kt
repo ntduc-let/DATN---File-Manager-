@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class FileSafeFolderAdapter(
@@ -114,8 +115,11 @@ class FileSafeFolderAdapter(
             binding.description.text = "${file.length().formatBytes()} ∙ ${getDateTimeFromMillis(millis = file.lastModified(), dateFormat = "MMM dd yyyy", locale = Locale.ENGLISH)}"
 
             binding.root.setOnClickListener {
+                val list = arrayListOf<File>()
+                list.addAll(currentList)
+
                 onOpenListener?.let {
-                    it(file)
+                    it(file, list)
                 }
             }
 
@@ -146,9 +150,9 @@ class FileSafeFolderAdapter(
         onMoreListener = listener
     }
 
-    private var onOpenListener: ((File) -> Unit)? = null
+    private var onOpenListener: ((File, ArrayList<File>) -> Unit)? = null
 
-    fun setOnOpenListener(listener: (File) -> Unit) {
+    fun setOnOpenListener(listener: (File, ArrayList<File>) -> Unit) {
         onOpenListener = listener
     }
 }

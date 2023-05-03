@@ -10,9 +10,11 @@ import com.ntduc.baseproject.constant.IS_FAVORITE
 import com.ntduc.baseproject.constant.RECENT_FILE
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.data.dto.base.BaseImage
 import com.ntduc.baseproject.databinding.FragmentHomeBinding
 import com.ntduc.baseproject.ui.adapter.RecentFilesAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
+import com.ntduc.baseproject.ui.component.image.ImageViewerActivity
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.office.OfficeReaderActivity
 import com.ntduc.baseproject.utils.DeviceUtils
@@ -94,6 +96,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             when(FileTypeExtension.getTypeFile(it.data!!)){
                 FileTypeExtension.DOC, FileTypeExtension.XLS, FileTypeExtension.PPT, FileTypeExtension.PDF, FileTypeExtension.TXT -> {
                     OfficeReaderActivity.openFile(requireContext(), it)
+                }
+                FileTypeExtension.IMAGE -> {
+                    ImageViewerActivity.openFile(requireContext(), arrayListOf(BaseImage(id = it.id, title = it.title, displayName = it.displayName, mimeType = it.mimeType, size = it.size, dateAdded = it.dateAdded, dateModified = it.dateModified, data = it.data, height = null, width = null)), 0)
                 }
                 else -> {
                     File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")

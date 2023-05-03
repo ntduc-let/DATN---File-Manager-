@@ -77,7 +77,7 @@ class OfficeReaderActivity : BaseActivity<ActivityOfficeDetailBinding>(ROffice.l
                     FileTypeExtension.PPT -> R.style.PPT
                     FileTypeExtension.PDF -> R.style.PDF
                     FileTypeExtension.TXT -> R.style.TXT
-                    else -> R.style.MainFullScreen
+                    else -> R.style.OfficeReaderScreen
                 }
             )
         }
@@ -117,7 +117,7 @@ class OfficeReaderActivity : BaseActivity<ActivityOfficeDetailBinding>(ROffice.l
         changeToolbarColorWithExtension()
 
         binding.toolbarOffice.setNavigationIcon(ROffice.drawable.ic_back_24)
-        binding.toolbarOffice.setTitleTextAppearance(this, ROffice.style.TitleToolBar2)
+        binding.toolbarOffice.setTitleTextAppearance(this, R.style.TitleToolBar)
 
         setSupportActionBar(binding.toolbarOffice)
         if (supportActionBar != null) {

@@ -2,8 +2,6 @@ package com.ntduc.baseproject.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.media.MediaMetadataRetriever
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
@@ -11,15 +9,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.constant.FAVORITE_AUDIO
 import com.ntduc.baseproject.constant.FAVORITE_IMAGE
 import com.ntduc.baseproject.constant.FileTypeExtension
 import com.ntduc.baseproject.data.dto.base.BaseImage
-import com.ntduc.baseproject.databinding.ItemDocumentBinding
 import com.ntduc.baseproject.databinding.ItemHeaderBinding
 import com.ntduc.baseproject.databinding.ItemImageBinding
 import com.ntduc.baseproject.utils.*
-import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
 import com.ntduc.recyclerviewsticky.StickyHeaders
@@ -63,8 +58,11 @@ class ImageAdapter(
             binding.description.text = "${baseImage.size?.formatBytes()}"
 
             binding.root.setOnClickListener {
+                val list = arrayListOf<BaseImage>()
+                list.addAll(currentList.filter { it.data != null })
+
                 onOpenListener?.let {
-                    it(baseImage)
+                    it(baseImage, list)
                 }
             }
 
@@ -156,9 +154,9 @@ class ImageAdapter(
         onMoreListener = listener
     }
 
-    private var onOpenListener: ((BaseImage) -> Unit)? = null
+    private var onOpenListener: ((BaseImage, ArrayList<BaseImage>) -> Unit)? = null
 
-    fun setOnOpenListener(listener: (BaseImage) -> Unit) {
+    fun setOnOpenListener(listener: (BaseImage, ArrayList<BaseImage>) -> Unit) {
         onOpenListener = listener
     }
 }

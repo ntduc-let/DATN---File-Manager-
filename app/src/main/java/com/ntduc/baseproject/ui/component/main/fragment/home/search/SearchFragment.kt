@@ -6,12 +6,22 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.constant.*
+import com.ntduc.baseproject.constant.FileTypeExtension
+import com.ntduc.baseproject.constant.RECENT_FILE
+import com.ntduc.baseproject.constant.SORT_BY
+import com.ntduc.baseproject.constant.SORT_BY_DATE_NEW
+import com.ntduc.baseproject.constant.SORT_BY_DATE_OLD
+import com.ntduc.baseproject.constant.SORT_BY_NAME_A_Z
+import com.ntduc.baseproject.constant.SORT_BY_NAME_Z_A
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_LARGE
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_SMALL
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.data.dto.base.BaseImage
 import com.ntduc.baseproject.databinding.FragmentSearchBinding
 import com.ntduc.baseproject.ui.adapter.SearchAdapter
 import com.ntduc.baseproject.ui.base.BaseFragment
+import com.ntduc.baseproject.ui.component.image.ImageViewerActivity
 import com.ntduc.baseproject.ui.component.main.MainViewModel
 import com.ntduc.baseproject.ui.component.main.fragment.SortBottomDialogFragment
 import com.ntduc.baseproject.ui.component.office.OfficeReaderActivity
@@ -58,10 +68,15 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
         }
 
         searchAdapter.setOnOpenListener {
-            when(FileTypeExtension.getTypeFile(it.data!!)){
+            when (FileTypeExtension.getTypeFile(it.data!!)) {
                 FileTypeExtension.DOC, FileTypeExtension.XLS, FileTypeExtension.PPT, FileTypeExtension.PDF, FileTypeExtension.TXT -> {
                     OfficeReaderActivity.openFile(requireContext(), it)
                 }
+
+                FileTypeExtension.IMAGE -> {
+                    ImageViewerActivity.openFile(requireContext(), arrayListOf(BaseImage(id = it.id, title = it.title, displayName = it.displayName, mimeType = it.mimeType, size = it.size, dateAdded = it.dateAdded, dateModified = it.dateModified, data = it.data, height = null, width = null)), 0)
+                }
+
                 else -> {
                     File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
                 }

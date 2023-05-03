@@ -156,6 +156,8 @@ dependencies {
     //Leak Canary: https://square.github.io/leakcanary/
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
+    implementation 'com.github.MikeOrtiz:TouchImageView:3.3'
+
     //ADS: https://gitlab.com/proxglobal/android/proxlib/-/tree/multiple_mediation
 //    implementation "prox-lib:prox-utils-multiple-mediation:1.0.10.2"
 }

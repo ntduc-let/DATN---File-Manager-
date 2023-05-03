@@ -69,7 +69,7 @@ class ListVideoSafeFragment : BaseFragment<FragmentListVideoSafeBinding>(R.layou
             dialog.show(childFragmentManager, "SortDialog")
         }
 
-        fileSafeFolderAdapter.setOnOpenListener {
+        fileSafeFolderAdapter.setOnOpenListener { it, list ->
             it.open(requireContext(), "${requireContext().packageName}.provider")
         }
 
