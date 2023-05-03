@@ -1,13 +1,29 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.video
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import com.brouken.player.PlayerActivity
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.constant.*
+import com.ntduc.baseproject.constant.DATE_HEAD
+import com.ntduc.baseproject.constant.FAVORITE_VIDEO
+import com.ntduc.baseproject.constant.IS_FAVORITE
+import com.ntduc.baseproject.constant.KEY_BASE_VIDEO
+import com.ntduc.baseproject.constant.NAME_HEAD
+import com.ntduc.baseproject.constant.RECENT_FILE
+import com.ntduc.baseproject.constant.SIZE_HEAD
+import com.ntduc.baseproject.constant.SORT_BY
+import com.ntduc.baseproject.constant.SORT_BY_DATE_NEW
+import com.ntduc.baseproject.constant.SORT_BY_DATE_OLD
+import com.ntduc.baseproject.constant.SORT_BY_NAME_A_Z
+import com.ntduc.baseproject.constant.SORT_BY_NAME_Z_A
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_LARGE
+import com.ntduc.baseproject.constant.SORT_BY_SIZE_SMALL
 import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.data.dto.base.BaseVideo
 import com.ntduc.baseproject.databinding.FragmentListImageBinding
@@ -18,9 +34,15 @@ import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
 import com.ntduc.baseproject.ui.component.main.dialog.MoveSafeFolderDialog
 import com.ntduc.baseproject.ui.component.main.dialog.RenameDialog
 import com.ntduc.baseproject.ui.component.main.dialog.VideoMoreDialog
-import com.ntduc.baseproject.utils.*
+import com.ntduc.baseproject.utils.BYTES_TO_GB
+import com.ntduc.baseproject.utils.BYTES_TO_MB
+import com.ntduc.baseproject.utils.BYTES_TO_TB
+import com.ntduc.baseproject.utils.currentMillis
 import com.ntduc.baseproject.utils.file.delete
-import com.ntduc.baseproject.utils.file.open
+import com.ntduc.baseproject.utils.getDateTimeFromMillis
+import com.ntduc.baseproject.utils.isAlphabetic
+import com.ntduc.baseproject.utils.navigateToDes
+import com.ntduc.baseproject.utils.observe
 import com.ntduc.baseproject.utils.security.FileEncryption
 import com.ntduc.baseproject.utils.toast.shortToast
 import com.ntduc.baseproject.utils.view.gone
@@ -33,7 +55,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.util.*
+import java.util.Locale
 
 class ListVideoFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragment_list_image) {
 
@@ -73,7 +95,10 @@ class ListVideoFragment : BaseFragment<FragmentListImageBinding>(R.layout.fragme
         super.addEvent()
 
         videoAdapter.setOnOpenListener {
-            File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
+            intent.setDataAndType(it.data!!.toUri(), it.mimeType)
+            startActivity(intent)
+
             updateRecent(it)
         }
 

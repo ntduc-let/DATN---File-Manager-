@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<network-security-config>
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
 
     <!-- For AdColony, this permits all cleartext traffic: -->
     <base-config cleartextTrafficPermitted="true">
         <trust-anchors>
-            <certificates src="system"/>
+            <!-- Trust preinstalled CAs -->
+            <certificates src="system" />
+            <!-- Additionally trust user added CAs -->
+            <certificates
+                src="user"
+                tools:ignore="AcceptsUserCertificates" />
         </trust-anchors>
     </base-config>
     <!-- End AdColony section -->

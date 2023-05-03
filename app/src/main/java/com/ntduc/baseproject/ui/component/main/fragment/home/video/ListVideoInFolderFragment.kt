@@ -1,12 +1,15 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.video
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.brouken.player.PlayerActivity
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.DATE_HEAD
 import com.ntduc.baseproject.constant.FAVORITE_VIDEO
@@ -41,7 +44,6 @@ import com.ntduc.baseproject.utils.BYTES_TO_TB
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
 import com.ntduc.baseproject.utils.currentMillis
 import com.ntduc.baseproject.utils.file.delete
-import com.ntduc.baseproject.utils.file.open
 import com.ntduc.baseproject.utils.getDateTimeFromMillis
 import com.ntduc.baseproject.utils.isAlphabetic
 import com.ntduc.baseproject.utils.navigateToDes
@@ -105,7 +107,10 @@ class ListVideoInFolderFragment : BaseFragment<FragmentListVideoInFolderBinding>
         }
 
         videoAdapter.setOnOpenListener {
-            File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
+            intent.setDataAndType(it.data!!.toUri(), it.mimeType)
+            startActivity(intent)
+
             updateRecent(it)
         }
 

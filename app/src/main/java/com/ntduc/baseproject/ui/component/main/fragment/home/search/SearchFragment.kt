@@ -1,10 +1,13 @@
 package com.ntduc.baseproject.ui.component.main.fragment.home.search
 
+import android.content.Intent
 import android.widget.SearchView
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.brouken.player.PlayerActivity
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.*
 import com.ntduc.baseproject.data.Resource
@@ -61,6 +64,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
             when(FileTypeExtension.getTypeFile(it.data!!)){
                 FileTypeExtension.DOC, FileTypeExtension.XLS, FileTypeExtension.PPT, FileTypeExtension.PDF, FileTypeExtension.TXT -> {
                     OfficeReaderActivity.openFile(requireContext(), it)
+                }
+                FileTypeExtension.VIDEO -> {
+                    val intent = Intent(requireContext(), PlayerActivity::class.java)
+                    intent.setDataAndType(it.data!!.toUri(), it.mimeType)
+                    startActivity(intent)
                 }
                 else -> {
                     File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
