@@ -1,9 +1,12 @@
 package com.ntduc.baseproject.ui.component.main.fragment
 
+import android.content.Intent
 import android.os.Bundle
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.brouken.player.PlayerActivity
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FileTypeExtension
 import com.ntduc.baseproject.constant.IS_FAVORITE
@@ -93,13 +96,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         super.addEvent()
 
         recentFilesAdapter.setOnOpenListener {
-            when(FileTypeExtension.getTypeFile(it.data!!)){
+            when (FileTypeExtension.getTypeFile(it.data!!)) {
                 FileTypeExtension.DOC, FileTypeExtension.XLS, FileTypeExtension.PPT, FileTypeExtension.PDF, FileTypeExtension.TXT -> {
                     OfficeReaderActivity.openFile(requireContext(), it)
                 }
+
                 FileTypeExtension.IMAGE -> {
                     ImageViewerActivity.openFile(requireContext(), arrayListOf(BaseImage(id = it.id, title = it.title, displayName = it.displayName, mimeType = it.mimeType, size = it.size, dateAdded = it.dateAdded, dateModified = it.dateModified, data = it.data, height = null, width = null)), 0)
                 }
+
+                FileTypeExtension.VIDEO -> {
+                    val intent = Intent(requireContext(), PlayerActivity::class.java)
+                    intent.setDataAndType(it.data!!.toUri(), it.mimeType)
+                    startActivity(intent)
+                }
+
                 else -> {
                     File(it.data!!).open(requireContext(), "${requireContext().packageName}.provider")
                 }
