@@ -42,11 +42,22 @@ import java.io.File
 
 class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_search) {
 
+    companion object {
+        private const val FILTER_ALL = 0
+        private const val FILTER_DOCUMENT = 1
+        private const val FILTER_VIDEO = 2
+        private const val FILTER_IMAGE = 3
+        private const val FILTER_AUDIO = 4
+
+    }
+
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var searchAdapter: SearchAdapter
 
     override fun initView() {
         super.initView()
+
+        resetFilterAll()
 
         searchAdapter = SearchAdapter(requireContext(), lifecycleScope)
         binding.rcv.apply {
@@ -68,6 +79,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
                 viewModel.requestAllSearch(binding.search.query.trim().toString())
             }
             dialog.show(childFragmentManager, "SortDialog")
+        }
+
+        binding.all.root.setOnClickListener {
+
         }
 
         searchAdapter.setOnOpenListener {
@@ -168,11 +183,95 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
                     }
                 }
             }
+
             is Resource.DataError -> {
                 binding.rcv.gone()
                 binding.layoutNoItem.root.visible()
                 binding.layoutLoading.root.gone()
             }
         }
+    }
+
+
+    private fun resetFilterAll() {
+        resetStateFilterAll()
+        resetStateFilterDocument()
+        resetStateFilterVideo()
+        resetStateFilterImage()
+        resetStateFilterAudio()
+        resetStateFilterApk()
+
+        resetFilterDocumentAll()
+
+        binding.filterDocument.gone()
+    }
+
+    private fun resetFilterDocumentAll() {
+        resetStateFilterDocumentAll()
+        resetStateFilterDocumentPdf()
+        resetStateFilterDocumentTxt()
+        resetStateFilterDocumentDoc()
+        resetStateFilterDocumentXls()
+        resetStateFilterDocumentPpt()
+    }
+
+    private fun resetStateFilterDocumentPpt() {
+        binding.documentPpt.text.text = getString(R.string.ppt)
+        binding.documentPpt.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterDocumentXls() {
+        binding.documentXls.text.text = getString(R.string.xls)
+        binding.documentXls.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterDocumentDoc() {
+        binding.documentDoc.text.text = getString(R.string.doc)
+        binding.documentDoc.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterDocumentTxt() {
+        binding.documentTxt.text.text = getString(R.string.txt)
+        binding.documentTxt.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterDocumentPdf() {
+        binding.documentPdf.text.text = getString(R.string.pdf)
+        binding.documentPdf.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterDocumentAll() {
+        binding.documentAll.text.text = getString(R.string.all)
+        binding.documentAll.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterApk() {
+        binding.apk.text.text = getString(R.string.apks)
+        binding.apk.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterAudio() {
+        binding.audio.text.text = getString(R.string.audio)
+        binding.audio.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterImage() {
+        binding.image.text.text = getString(R.string.images)
+        binding.image.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterVideo() {
+        binding.video.text.text = getString(R.string.videos)
+        binding.video.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterDocument() {
+        binding.document.text.text = getString(R.string.document)
+        binding.document.text.setBackgroundResource(R.color.blue_second)
+    }
+
+    private fun resetStateFilterAll() {
+        binding.all.text.text = getString(R.string.all)
+        binding.all.text.setBackgroundResource(R.color.blue_second)
     }
 }

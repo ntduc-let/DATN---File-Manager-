@@ -42,7 +42,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
         <SearchView
             android:id="@+id/search"
             android:layout_width="match_parent"
@@ -59,6 +58,82 @@
             app:layout_constraintStart_toEndOf="@id/back"
             app:layout_constraintTop_toBottomOf="@id/title" />
 
+        <HorizontalScrollView
+            android:id="@+id/filter_all"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scrollbars="none"
+            app:layout_constraintTop_toBottomOf="@id/search">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <include
+                    android:id="@+id/all"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/document"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/video"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/image"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/audio"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/apk"
+                    layout="@layout/item_filter_search" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
+            android:id="@+id/filter_document"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scrollbars="none"
+            app:layout_constraintTop_toBottomOf="@id/filter_all">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <include
+                    android:id="@+id/document_all"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/document_pdf"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/document_txt"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/document_doc"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/document_xls"
+                    layout="@layout/item_filter_search" />
+
+                <include
+                    android:id="@+id/document_ppt"
+                    layout="@layout/item_filter_search" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcv"
             android:layout_width="match_parent"
@@ -67,7 +142,7 @@
             android:paddingHorizontal="4dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search" />
+            app:layout_constraintTop_toBottomOf="@id/filter_document" />
 
         <include
             android:id="@+id/layout_no_item"
@@ -76,7 +151,7 @@
             android:layout_height="0dp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search" />
+            app:layout_constraintTop_toBottomOf="@id/filter_document" />
 
         <include
             android:id="@+id/layout_loading"
@@ -85,6 +160,6 @@
             android:layout_height="0dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search" />
+            app:layout_constraintTop_toBottomOf="@id/filter_document" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
