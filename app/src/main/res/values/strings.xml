@@ -85,5 +85,10 @@
     <string name="new_folder">New folder</string>
     <string name="name_folder">Name folder</string>
     <string name="move_here">Move here</string>
+    <string name="unlock">Unlock</string>
+    <string name="do_you_want_to_unlock_security">Do you want to unlock security?</string>
+    <string name="restore">Restore</string>
+    <string name="delete_all">Delete all</string>
+    <string name="restore_all">Restore all</string>
 
 </resources>

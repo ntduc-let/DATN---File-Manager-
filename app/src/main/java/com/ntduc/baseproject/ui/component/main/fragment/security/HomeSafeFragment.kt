@@ -1,5 +1,6 @@
 package com.ntduc.baseproject.ui.component.main.fragment.security
 
+import android.os.Environment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -8,7 +9,11 @@ import com.ntduc.baseproject.data.Resource
 import com.ntduc.baseproject.databinding.FragmentHomeSafeBinding
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
+import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
+import com.ntduc.baseproject.ui.component.main.dialog.UnlockDialog
 import com.ntduc.baseproject.utils.clickeffect.setOnClickShrinkEffectListener
+import com.ntduc.baseproject.utils.file.delete
+import com.ntduc.baseproject.utils.file.moveTo
 import com.ntduc.baseproject.utils.formatBytes
 import com.ntduc.baseproject.utils.navigateToDes
 import com.ntduc.baseproject.utils.observe
@@ -71,6 +76,150 @@ class HomeSafeFragment : BaseFragment<FragmentHomeSafeBinding>(R.layout.fragment
 
         binding.videos.root.setOnClickShrinkEffectListener {
             navigateToDes(R.id.listVideoSafeFragment)
+        }
+
+        binding.unlock.setOnClickShrinkEffectListener {
+            val dialog = UnlockDialog()
+            dialog.setOnDeleteListener {
+                dialog.dismiss()
+                val dialogLoading = LoadingEncryptionDialog()
+                dialogLoading.show(childFragmentManager, "LoadingEncryptionDialog")
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    File(Environment.getExternalStorageDirectory().path + "/.${requireContext().getString(R.string.app_name)}/.SafeFolder/").delete(requireContext())
+
+                    withContext(Dispatchers.Main) {
+                        dialogLoading.dismiss()
+                        findNavController().popBackStack()
+                    }
+                }
+            }
+            dialog.setOnRestoreListener {
+                dialog.dismiss()
+                val dialogLoading = LoadingEncryptionDialog()
+                dialogLoading.show(childFragmentManager, "LoadingEncryptionDialog")
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    restoreApk()
+                    restoreVideo()
+                    restoreDocument()
+                    restoreImage()
+                    restoreAudio()
+
+                    File(Environment.getExternalStorageDirectory().path + "/.${requireContext().getString(R.string.app_name)}/.SafeFolder/").delete(requireContext())
+
+                    withContext(Dispatchers.Main) {
+                        dialogLoading.dismiss()
+                        findNavController().popBackStack()
+                    }
+                }
+            }
+            dialog.show(childFragmentManager, "UnlockDialog")
+        }
+    }
+
+    private fun restoreApk() {
+        val restoreFolder = File(Environment.getExternalStorageDirectory().path + "/${getString(R.string.app_name)}/Restore/apk")
+        if (!restoreFolder.exists()) {
+            restoreFolder.mkdirs()
+        }
+
+        val cacheFolder = File(requireContext().filesDir.path + "/.SafeFolder/apk")
+        cacheFolder.listFiles()?.forEach {
+            it.moveTo(requireContext(), restoreFolder)
+        }
+
+        val folder = File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}/.SafeFolder/apk")
+        if (!folder.exists()) {
+            folder.mkdirs()
+        }
+
+        folder.listFiles()?.forEach {
+            File("${folder.path}/${it.name}").delete(requireContext())
+        }
+    }
+
+    private fun restoreVideo() {
+        val restoreFolder = File(Environment.getExternalStorageDirectory().path + "/${getString(R.string.app_name)}/Restore/video")
+        if (!restoreFolder.exists()) {
+            restoreFolder.mkdirs()
+        }
+
+        val cacheFolder = File(requireContext().filesDir.path + "/.SafeFolder/video")
+        cacheFolder.listFiles()?.forEach {
+            it.moveTo(requireContext(), restoreFolder)
+        }
+
+        val folder = File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}/.SafeFolder/video")
+        if (!folder.exists()) {
+            folder.mkdirs()
+        }
+
+        folder.listFiles()?.forEach {
+            File("${folder.path}/${it.name}").delete(requireContext())
+        }
+    }
+
+    private fun restoreDocument() {
+        val restoreFolder = File(Environment.getExternalStorageDirectory().path + "/${getString(R.string.app_name)}/Restore/document")
+        if (!restoreFolder.exists()) {
+            restoreFolder.mkdirs()
+        }
+
+        val cacheFolder = File(requireContext().filesDir.path + "/.SafeFolder/document")
+        cacheFolder.listFiles()?.forEach {
+            it.moveTo(requireContext(), restoreFolder)
+        }
+
+        val folder = File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}/.SafeFolder/document")
+        if (!folder.exists()) {
+            folder.mkdirs()
+        }
+
+        folder.listFiles()?.forEach {
+            File("${folder.path}/${it.name}").delete(requireContext())
+        }
+    }
+
+    private fun restoreImage() {
+        val restoreFolder = File(Environment.getExternalStorageDirectory().path + "/${getString(R.string.app_name)}/Restore/image")
+        if (!restoreFolder.exists()) {
+            restoreFolder.mkdirs()
+        }
+
+        val cacheFolder = File(requireContext().filesDir.path + "/.SafeFolder/image")
+        cacheFolder.listFiles()?.forEach {
+            it.moveTo(requireContext(), restoreFolder)
+        }
+
+        val folder = File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}/.SafeFolder/image")
+        if (!folder.exists()) {
+            folder.mkdirs()
+        }
+
+        folder.listFiles()?.forEach {
+            File("${folder.path}/${it.name}").delete(requireContext())
+        }
+    }
+
+    private fun restoreAudio() {
+        val restoreFolder = File(Environment.getExternalStorageDirectory().path + "/${getString(R.string.app_name)}/Restore/audio")
+        if (!restoreFolder.exists()) {
+            restoreFolder.mkdirs()
+        }
+
+        val cacheFolder = File(requireContext().filesDir.path + "/.SafeFolder/audio")
+        cacheFolder.listFiles()?.forEach {
+            it.moveTo(requireContext(), restoreFolder)
+        }
+
+        val folder = File(Environment.getExternalStorageDirectory().path + "/.${getString(R.string.app_name)}/.SafeFolder/audio")
+        if (!folder.exists()) {
+            folder.mkdirs()
+        }
+
+        folder.listFiles()?.forEach {
+            File("${folder.path}/${it.name}").delete(requireContext())
         }
     }
 
