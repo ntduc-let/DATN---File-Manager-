@@ -96,151 +96,176 @@ class LocalData @Inject constructor(val context: Context) {
 
     fun loadApkSafe(context: Context): Resource<List<File>> {
         val result = ArrayList<File>()
-        val apkFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/apk")
-        if (!apkFolder.exists()) {
-            apkFolder.mkdirs()
-        }
-        val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
-        val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
-        val pass = String(bytes, Charsets.UTF_8)
-        val apkCacheFolder = File(context.filesDir.path + "/.SafeFolder/apk")
-        if (!apkCacheFolder.exists()) {
-            apkCacheFolder.mkdirs()
-        }else{
-            apkCacheFolder.listFiles()?.forEach {
-                it.delete(context)
+        try {
+            val apkFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/apk")
+            if (!apkFolder.exists()) {
+                apkFolder.mkdirs()
             }
+            val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
+            val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
+            val pass = String(bytes, Charsets.UTF_8)
+            val apkCacheFolder = File(context.filesDir.path + "/.SafeFolder/apk")
+            if (!apkCacheFolder.exists()) {
+                apkCacheFolder.mkdirs()
+            } else {
+                apkCacheFolder.listFiles()?.forEach {
+                    it.delete(context)
+                }
+            }
+            apkFolder.listFiles()?.forEach {
+                val outputFile = File(apkCacheFolder.path + "/${it.name}")
+                FileEncryption.decryptToFile(
+                    "$pass$pass$pass$pass",
+                    "abcdefghptreqwrf",
+                    FileInputStream(it),
+                    FileOutputStream(outputFile)
+                )
+                result.add(outputFile)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        apkFolder.listFiles()?.forEach {
-            val outputFile = File(apkCacheFolder.path + "/${it.name}")
-            FileEncryption.decryptToFile(
-                "$pass$pass$pass$pass",
-                "abcdefghptreqwrf",
-                FileInputStream(it),
-                FileOutputStream(outputFile)
-            )
-            result.add(outputFile)
-        }
+
         return Resource.Success(result)
     }
 
     fun loadVideoSafe(context: Context): Resource<List<File>> {
         val result = ArrayList<File>()
-        val videoFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/video")
-        if (!videoFolder.exists()) {
-            videoFolder.mkdirs()
-        }
-        val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
-        val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
-        val pass = String(bytes, Charsets.UTF_8)
-        val videoCacheFolder = File(context.filesDir.path + "/.SafeFolder/video")
-        if (!videoCacheFolder.exists()) {
-            videoCacheFolder.mkdirs()
-        }else{
-            videoCacheFolder.listFiles()?.forEach {
-                it.delete(context)
+        try {
+            val videoFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/video")
+            if (!videoFolder.exists()) {
+                videoFolder.mkdirs()
             }
+            val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
+            val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
+            val pass = String(bytes, Charsets.UTF_8)
+            val videoCacheFolder = File(context.filesDir.path + "/.SafeFolder/video")
+            if (!videoCacheFolder.exists()) {
+                videoCacheFolder.mkdirs()
+            } else {
+                videoCacheFolder.listFiles()?.forEach {
+                    it.delete(context)
+                }
+            }
+            videoFolder.listFiles()?.forEach {
+                val outputFile = File(videoCacheFolder.path + "/${it.name}")
+                FileEncryption.decryptToFile(
+                    "$pass$pass$pass$pass",
+                    "abcdefghptreqwrf",
+                    FileInputStream(it),
+                    FileOutputStream(outputFile)
+                )
+                result.add(outputFile)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        videoFolder.listFiles()?.forEach {
-            val outputFile = File(videoCacheFolder.path + "/${it.name}")
-            FileEncryption.decryptToFile(
-                "$pass$pass$pass$pass",
-                "abcdefghptreqwrf",
-                FileInputStream(it),
-                FileOutputStream(outputFile)
-            )
-            result.add(outputFile)
-        }
+
         return Resource.Success(result)
     }
 
     fun loadDocumentSafe(context: Context): Resource<List<File>> {
         val result = ArrayList<File>()
-        val documentFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/document")
-        if (!documentFolder.exists()) {
-            documentFolder.mkdirs()
-        }
-        val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
-        val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
-        val pass = String(bytes, Charsets.UTF_8)
-        val documentCacheFolder = File(context.filesDir.path + "/.SafeFolder/document")
-        if (!documentCacheFolder.exists()) {
-            documentCacheFolder.mkdirs()
-        }else{
-            documentCacheFolder.listFiles()?.forEach {
-                it.delete(context)
+        try {
+            val documentFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/document")
+            if (!documentFolder.exists()) {
+                documentFolder.mkdirs()
             }
+            val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
+            val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
+            val pass = String(bytes, Charsets.UTF_8)
+            val documentCacheFolder = File(context.filesDir.path + "/.SafeFolder/document")
+            if (!documentCacheFolder.exists()) {
+                documentCacheFolder.mkdirs()
+            } else {
+                documentCacheFolder.listFiles()?.forEach {
+                    it.delete(context)
+                }
+            }
+            documentFolder.listFiles()?.forEach {
+                val outputFile = File(documentCacheFolder.path + "/${it.name}")
+                FileEncryption.decryptToFile(
+                    "$pass$pass$pass$pass",
+                    "abcdefghptreqwrf",
+                    FileInputStream(it),
+                    FileOutputStream(outputFile)
+                )
+                result.add(outputFile)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        documentFolder.listFiles()?.forEach {
-            val outputFile = File(documentCacheFolder.path + "/${it.name}")
-            FileEncryption.decryptToFile(
-                "$pass$pass$pass$pass",
-                "abcdefghptreqwrf",
-                FileInputStream(it),
-                FileOutputStream(outputFile)
-            )
-            result.add(outputFile)
-        }
+
         return Resource.Success(result)
     }
 
     fun loadImageSafe(context: Context): Resource<List<File>> {
         val result = ArrayList<File>()
-        val imageFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/image")
-        if (!imageFolder.exists()) {
-            imageFolder.mkdirs()
-        }
-        val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
-        val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
-        val pass = String(bytes, Charsets.UTF_8)
-        val imageCacheFolder = File(context.filesDir.path + "/.SafeFolder/image")
-        if (!imageCacheFolder.exists()) {
-            imageCacheFolder.mkdirs()
-        }else{
-            imageCacheFolder.listFiles()?.forEach {
-                it.delete(context)
+        try {
+            val imageFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/image")
+            if (!imageFolder.exists()) {
+                imageFolder.mkdirs()
             }
+            val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
+            val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
+            val pass = String(bytes, Charsets.UTF_8)
+            val imageCacheFolder = File(context.filesDir.path + "/.SafeFolder/image")
+            if (!imageCacheFolder.exists()) {
+                imageCacheFolder.mkdirs()
+            } else {
+                imageCacheFolder.listFiles()?.forEach {
+                    it.delete(context)
+                }
+            }
+            imageFolder.listFiles()?.forEach {
+                val outputFile = File(imageCacheFolder.path + "/${it.name}")
+                FileEncryption.decryptToFile(
+                    "$pass$pass$pass$pass",
+                    "abcdefghptreqwrf",
+                    FileInputStream(it),
+                    FileOutputStream(outputFile)
+                )
+                result.add(outputFile)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        imageFolder.listFiles()?.forEach {
-            val outputFile = File(imageCacheFolder.path + "/${it.name}")
-            FileEncryption.decryptToFile(
-                "$pass$pass$pass$pass",
-                "abcdefghptreqwrf",
-                FileInputStream(it),
-                FileOutputStream(outputFile)
-            )
-            result.add(outputFile)
-        }
+
         return Resource.Success(result)
     }
 
     fun loadAudioSafe(context: Context): Resource<List<File>> {
         val result = ArrayList<File>()
-        val audioFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/audio")
-        if (!audioFolder.exists()) {
-            audioFolder.mkdirs()
-        }
-        val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
-        val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
-        val pass = String(bytes, Charsets.UTF_8)
-        val audioCacheFolder = File(context.filesDir.path + "/.SafeFolder/audio")
-        if (!audioCacheFolder.exists()) {
-            audioCacheFolder.mkdirs()
-        }else{
-            audioCacheFolder.listFiles()?.forEach {
-                it.delete(context)
+        try {
+            val audioFolder = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/audio")
+            if (!audioFolder.exists()) {
+                audioFolder.mkdirs()
             }
+            val passEncrypted = File(Environment.getExternalStorageDirectory().path + "/.${context.getString(R.string.app_name)}/.SafeFolder/pass.txt").readToString()
+            val bytes = Base64.decode(passEncrypted, Base64.DEFAULT)
+            val pass = String(bytes, Charsets.UTF_8)
+            val audioCacheFolder = File(context.filesDir.path + "/.SafeFolder/audio")
+            if (!audioCacheFolder.exists()) {
+                audioCacheFolder.mkdirs()
+            }else{
+                audioCacheFolder.listFiles()?.forEach {
+                    it.delete(context)
+                }
+            }
+            audioFolder.listFiles()?.forEach {
+                val outputFile = File(audioCacheFolder.path + "/${it.name}")
+                FileEncryption.decryptToFile(
+                    "$pass$pass$pass$pass",
+                    "abcdefghptreqwrf",
+                    FileInputStream(it),
+                    FileOutputStream(outputFile)
+                )
+                result.add(outputFile)
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
         }
-        audioFolder.listFiles()?.forEach {
-            val outputFile = File(audioCacheFolder.path + "/${it.name}")
-            FileEncryption.decryptToFile(
-                "$pass$pass$pass$pass",
-                "abcdefghptreqwrf",
-                FileInputStream(it),
-                FileOutputStream(outputFile)
-            )
-            result.add(outputFile)
-        }
+
         return Resource.Success(result)
     }
 
