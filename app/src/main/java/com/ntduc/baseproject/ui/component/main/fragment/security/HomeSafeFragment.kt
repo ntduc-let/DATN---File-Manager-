@@ -79,7 +79,7 @@ class HomeSafeFragment : BaseFragment<FragmentHomeSafeBinding>(R.layout.fragment
         }
 
         binding.unlock.setOnClickShrinkEffectListener {
-            val dialog = UnlockDialog()
+            val dialog = UnlockDialog.newInstance(true)
             dialog.setOnDeleteListener {
                 dialog.dismiss()
                 val dialogLoading = LoadingEncryptionDialog()

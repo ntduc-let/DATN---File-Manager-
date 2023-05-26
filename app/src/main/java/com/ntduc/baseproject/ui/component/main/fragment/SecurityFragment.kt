@@ -5,20 +5,28 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Base64
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.databinding.FragmentSecurityBinding
 import com.ntduc.baseproject.ui.base.BaseFragment
 import com.ntduc.baseproject.ui.component.main.MainViewModel
+import com.ntduc.baseproject.ui.component.main.dialog.LoadingEncryptionDialog
+import com.ntduc.baseproject.ui.component.main.dialog.UnlockDialog
 import com.ntduc.baseproject.ui.component.main.fragment.security.textwatcher.GenericKeyEvent
 import com.ntduc.baseproject.ui.component.main.fragment.security.textwatcher.GenericTextWatcher
 import com.ntduc.baseproject.utils.activity.hideKeyboard
 import com.ntduc.baseproject.utils.activity.showKeyboard
+import com.ntduc.baseproject.utils.file.delete
 import com.ntduc.baseproject.utils.file.readToString
 import com.ntduc.baseproject.utils.file.writeToFile
 import com.ntduc.baseproject.utils.navigateToDes
 import com.ntduc.baseproject.utils.toast.shortToast
 import com.ntduc.baseproject.utils.view.gone
 import com.ntduc.baseproject.utils.view.visible
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class SecurityFragment : BaseFragment<FragmentSecurityBinding>(R.layout.fragment_security) {
@@ -32,9 +40,11 @@ class SecurityFragment : BaseFragment<FragmentSecurityBinding>(R.layout.fragment
         checkNullEdt()
         if (isFolderSafeExists()) {
             binding.login.visible()
+            binding.delete.visible()
             binding.create.gone()
         } else {
             binding.login.gone()
+            binding.delete.gone()
             binding.create.visible()
         }
     }
@@ -69,6 +79,29 @@ class SecurityFragment : BaseFragment<FragmentSecurityBinding>(R.layout.fragment
             } else {
                 shortToast("Mật khẩu phải đủ 6 chữ số. Hãy thử lại!")
             }
+        }
+
+        binding.delete.setOnClickListener {
+            val dialog = UnlockDialog.newInstance(false)
+            dialog.setOnDeleteListener {
+                dialog.dismiss()
+                val dialogLoading = LoadingEncryptionDialog()
+                dialogLoading.show(childFragmentManager, "LoadingEncryptionDialog")
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    File(Environment.getExternalStorageDirectory().path + "/.${requireContext().getString(R.string.app_name)}/.SafeFolder/").delete(requireContext())
+
+                    withContext(Dispatchers.Main) {
+                        dialogLoading.dismiss()
+
+                        binding.login.gone()
+                        binding.delete.gone()
+                        binding.create.visible()
+                    }
+                }
+            }
+
+            dialog.show(childFragmentManager, "UnlockDialog")
         }
 
         binding.otpET1.addTextChangedListener(GenericTextWatcher(binding.otpET1, binding.otpET2))
