@@ -82,5 +82,8 @@
     <string name="security_document">Security document</string>
     <string name="security_images">Security images</string>
     <string name="security_video">Security video</string>
+    <string name="new_folder">New folder</string>
+    <string name="name_folder">Name folder</string>
+    <string name="move_here">Move here</string>
 
 </resources>

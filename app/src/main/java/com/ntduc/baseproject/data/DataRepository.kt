@@ -1,13 +1,17 @@
 package com.ntduc.baseproject.data
 
 import android.content.Context
-import com.ntduc.baseproject.data.dto.base.*
+import com.ntduc.baseproject.data.dto.base.BaseApk
+import com.ntduc.baseproject.data.dto.base.BaseApp
+import com.ntduc.baseproject.data.dto.base.BaseAudio
+import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.data.dto.base.BaseImage
+import com.ntduc.baseproject.data.dto.base.BaseVideo
 import com.ntduc.baseproject.data.dto.frames.DataFrames
 import com.ntduc.baseproject.data.dto.login.LoginRequest
 import com.ntduc.baseproject.data.dto.login.LoginResponse
 import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
 import com.ntduc.baseproject.data.dto.recipes.Recipes
-import com.ntduc.baseproject.data.dto.root.FolderFile
 import com.ntduc.baseproject.data.local.LocalData
 import com.ntduc.baseproject.data.remote.RemoteData
 import kotlinx.coroutines.flow.Flow
@@ -104,7 +108,7 @@ class DataRepository @Inject constructor(private val remoteRepository: RemoteDat
         }.flowOn(ioDispatcher)
     }
 
-    override suspend fun requestAllFolderFile(path: String): Flow<Resource<List<FolderFile>>> {
+    override suspend fun requestAllFolderFile(path: String): Flow<Resource<List<BaseFile>>> {
         return flow {
             emit(localRepository.requestAllFolderFile(path))
         }.flowOn(ioDispatcher)

@@ -116,4 +116,8 @@
         android:id="@+id/listVideoSafeFragment"
         android:name="com.ntduc.baseproject.ui.component.main.fragment.security.list.ListVideoSafeFragment"
         android:label="ListVideoSafeFragment" />
+    <fragment
+        android:id="@+id/folderDetailFragment"
+        android:name="com.ntduc.baseproject.ui.component.main.fragment.files.FolderDetailFragment"
+        android:label="FolderDetailFragment" />
 </navigation>

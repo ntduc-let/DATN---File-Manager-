@@ -7,9 +7,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.ntduc.baseproject.data.DataRepositorySource
 import com.ntduc.baseproject.data.Resource
-import com.ntduc.baseproject.data.dto.base.*
+import com.ntduc.baseproject.data.dto.base.BaseApk
+import com.ntduc.baseproject.data.dto.base.BaseApp
+import com.ntduc.baseproject.data.dto.base.BaseAudio
+import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.data.dto.base.BaseImage
+import com.ntduc.baseproject.data.dto.base.BaseVideo
 import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
-import com.ntduc.baseproject.data.dto.root.FolderFile
 import com.ntduc.baseproject.ui.base.BaseViewModel
 import com.ntduc.baseproject.utils.wrapEspressoIdlingResource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -98,8 +102,8 @@ class MainViewModel @Inject constructor(
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val folderFileListLiveDataPrivate = MutableLiveData<Resource<List<FolderFile>>>()
-    val folderFileListLiveData: LiveData<Resource<List<FolderFile>>> get() = folderFileListLiveDataPrivate
+    val folderFileListLiveDataPrivate = MutableLiveData<Resource<List<BaseFile>>>()
+    val folderFileListLiveData: LiveData<Resource<List<BaseFile>>> get() = folderFileListLiveDataPrivate
 
     fun requestAllFolderFile(path: String) {
         viewModelScope.launch {

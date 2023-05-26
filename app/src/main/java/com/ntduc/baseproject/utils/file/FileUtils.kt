@@ -19,6 +19,17 @@ import java.io.*
 import java.util.*
 
 fun File.mimeType(): String? = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+fun File.size(): Long {
+    var size: Long = 0
+    if (isDirectory) {
+        listFiles()?.forEach {
+            size += it.size()
+        }
+    } else size += length()
+
+    return size
+}
+
 
 fun File.renameTo(context: Context, newName: String): File? {
     try {

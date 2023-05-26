@@ -5,16 +5,31 @@ import android.content.SharedPreferences
 import android.os.Environment
 import android.util.Base64
 import com.ntduc.baseproject.R
-import com.ntduc.baseproject.constant.*
+import com.ntduc.baseproject.constant.FAVOURITES_KEY
+import com.ntduc.baseproject.constant.FileType
+import com.ntduc.baseproject.constant.PLAYLIST_AUDIO
+import com.ntduc.baseproject.constant.RECENT_FILE
+import com.ntduc.baseproject.constant.SHARED_PREFERENCES_FILE_NAME
 import com.ntduc.baseproject.data.Resource
-import com.ntduc.baseproject.data.dto.base.*
+import com.ntduc.baseproject.data.dto.base.BaseApk
+import com.ntduc.baseproject.data.dto.base.BaseApp
+import com.ntduc.baseproject.data.dto.base.BaseAudio
+import com.ntduc.baseproject.data.dto.base.BaseFile
+import com.ntduc.baseproject.data.dto.base.BaseImage
+import com.ntduc.baseproject.data.dto.base.BaseVideo
 import com.ntduc.baseproject.data.dto.login.LoginRequest
 import com.ntduc.baseproject.data.dto.login.LoginResponse
 import com.ntduc.baseproject.data.dto.playlist.PlaylistAudioFile
-import com.ntduc.baseproject.data.dto.root.FolderFile
 import com.ntduc.baseproject.data.error.PASS_WORD_ERROR
 import com.ntduc.baseproject.utils.currentMillis
-import com.ntduc.baseproject.utils.file.*
+import com.ntduc.baseproject.utils.file.delete
+import com.ntduc.baseproject.utils.file.getAudios
+import com.ntduc.baseproject.utils.file.getFiles
+import com.ntduc.baseproject.utils.file.getImages
+import com.ntduc.baseproject.utils.file.getVideos
+import com.ntduc.baseproject.utils.file.mimeType
+import com.ntduc.baseproject.utils.file.readToString
+import com.ntduc.baseproject.utils.file.size
 import com.ntduc.baseproject.utils.getApks
 import com.ntduc.baseproject.utils.getApps
 import com.ntduc.baseproject.utils.security.FileEncryption
@@ -22,7 +37,6 @@ import com.orhanobut.hawk.Hawk
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -230,21 +244,20 @@ class LocalData @Inject constructor(val context: Context) {
         return Resource.Success(result)
     }
 
-    fun requestAllFolderFile(path: String): Resource<List<FolderFile>> {
+    fun requestAllFolderFile(path: String): Resource<List<BaseFile>> {
         val files = File(path)
-        val result = ArrayList<FolderFile>()
+        val result = ArrayList<BaseFile>()
         files.listFiles()?.forEach {
             if (!it.isHidden) {
-                val folderFile = FolderFile(
+                val folderFile = BaseFile(
                     id = currentMillis,
-                    displayName = it.nameWithoutExtension,
-                    title = it.name,
+                    displayName = it.name,
+                    title = it.nameWithoutExtension,
                     mimeType = it.mimeType(),
-                    size = it.length(),
+                    size = it.size(),
                     dateAdded = it.lastModified(),
                     dateModified = it.lastModified(),
-                    data = it.path,
-                    isSelected = false
+                    data = it.path
                 )
                 result.add(folderFile)
             }

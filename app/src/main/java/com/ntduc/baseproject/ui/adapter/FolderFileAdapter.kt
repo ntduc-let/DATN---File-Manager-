@@ -2,8 +2,10 @@ package com.ntduc.baseproject.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -11,7 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ntduc.baseproject.R
 import com.ntduc.baseproject.constant.FileTypeExtension
-import com.ntduc.baseproject.data.dto.root.FolderFile
+import com.ntduc.baseproject.data.dto.base.BaseFile
 import com.ntduc.baseproject.databinding.ItemFolderFileBinding
 import com.ntduc.baseproject.utils.*
 import com.ntduc.baseproject.utils.view.invisible
@@ -26,49 +28,63 @@ import java.util.*
 
 
 class FolderFileAdapter(
-    val context: Context,
-    val lifecycleScope: LifecycleCoroutineScope,
-    var type: Int = NORMAL
-) : BindingListAdapter<FolderFile, FolderFileAdapter.ItemViewHolder>(diffUtil) {
+    val context: Context, val lifecycleScope: LifecycleCoroutineScope, var type: Int = NORMAL
+) : BindingListAdapter<BaseFile, FolderFileAdapter.ItemViewHolder>(diffUtil) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder =
-        parent.binding<ItemFolderFileBinding>(R.layout.item_folder_file).let(::ItemViewHolder)
+    private var fileMove: BaseFile? = null
 
-    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) =
-        holder.bind(getItem(position), position)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder = parent.binding<ItemFolderFileBinding>(R.layout.item_folder_file).let(::ItemViewHolder)
+
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) = holder.bind(getItem(position), position)
 
     inner class ItemViewHolder constructor(
         private val binding: ItemFolderFileBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(folderFile: FolderFile, position: Int) {
+        fun bind(baseFile: BaseFile, position: Int) {
             when (type) {
-                NORMAL -> {
-                    binding.checked.invisible()
-                    binding.more.visible()
-                }
-                SELECT -> {
-                    binding.checked.isActivated = folderFile.isSelected
-
-                    binding.checked.visible()
-                    binding.more.invisible()
-                }
-                MOVE -> {
-                    binding.checked.invisible()
-                    binding.more.invisible()
-                }
+                NORMAL -> binding.more.visible()
+                MOVE -> binding.more.invisible()
             }
 
-            val file = File(folderFile.data!!)
+            val file = File(baseFile.data!!)
             if (file.isDirectory) {
                 binding.ic.setImageResource(R.drawable.ic_folder_24dp)
+                binding.description.text = "${file.listFiles()?.size ?: 0} items    " + baseFile.size!!.formatBytes()
             } else {
-                when (FileTypeExtension.getTypeFile(folderFile.data!!)) {
+                binding.description.text = baseFile.size!!.formatBytes() + "    " + getDateTimeFromMillis(baseFile.dateModified!!, "MMM dd, yyyy", Locale.ENGLISH)
+                when (FileTypeExtension.getTypeFile(baseFile.data!!)) {
+                    FileTypeExtension.APK -> {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                context.packageManager.getPackageArchiveInfo(baseFile.data!!, PackageManager.PackageInfoFlags.of(0))
+                            } else {
+                                context.packageManager.getPackageArchiveInfo(baseFile.data!!, 0)
+                            }
+                            val icon = if (pi != null) {
+                                pi.applicationInfo.sourceDir = baseFile.data!!
+                                pi.applicationInfo.publicSourceDir = baseFile.data!!
+
+                                pi.applicationInfo.loadIcon(context.packageManager)
+                            } else {
+                                null
+                            }
+
+                            withContext(Dispatchers.Main) {
+                                if (icon != null) {
+                                    binding.ic.setImageDrawable(icon)
+                                } else {
+                                    binding.ic.setImageResource(R.drawable.ic_launcher_foreground)
+                                }
+                            }
+                        }
+                    }
+
                     FileTypeExtension.AUDIO -> {
-                        lifecycleScope.launch {
+                        lifecycleScope.launch(Dispatchers.IO) {
                             val image = try {
                                 val mData = MediaMetadataRetriever()
-                                mData.setDataSource(folderFile.data)
+                                mData.setDataSource(baseFile.data)
                                 val art = mData.embeddedPicture
                                 BitmapFactory.decodeByteArray(art, 0, art!!.size)
                             } catch (e: Exception) {
@@ -79,60 +95,59 @@ class FolderFileAdapter(
                                 context.loadImg(
                                     imgUrl = image,
                                     view = binding.ic,
-                                    error = FileTypeExtension.getIconFile(folderFile.data!!),
+                                    error = FileTypeExtension.getIconFile(baseFile.data!!),
                                     placeHolder = R.color.black
                                 )
                             }
                         }
                     }
+
+                    FileTypeExtension.PDF, FileTypeExtension.TXT, FileTypeExtension.DOC, FileTypeExtension.XLS, FileTypeExtension.PPT -> {
+                        context.loadImg(
+                            imgUrl = baseFile.data!!,
+                            view = binding.ic,
+                            error = FileTypeExtension.getIconDocument(baseFile.data!!),
+                            placeHolder = R.color.black
+                        )
+                    }
+
                     else -> {
                         context.loadImg(
-                            imgUrl = folderFile.data!!,
+                            imgUrl = baseFile.data!!,
                             view = binding.ic,
-                            error = FileTypeExtension.getIconFile(folderFile.data!!),
+                            error = FileTypeExtension.getIconFile(baseFile.data!!),
                             placeHolder = R.color.black
                         )
                     }
                 }
             }
-            binding.title.text = folderFile.displayName
-            binding.description.text = folderFile.size!!.formatBytes() + "    " + getDateTimeFromMillis(folderFile.dateModified!!, "MMM dd, yyyy", Locale.ENGLISH)
-            binding.checked.isActivated = folderFile.isSelected
+            binding.title.text = baseFile.displayName
 
-            binding.root.setOnClickListener {
-                if (type == NORMAL || type == MOVE) {
-                    if (File(folderFile.data!!).isDirectory) {
-                        onClickListener?.let {
-                            it(folderFile)
-                        }
-                    } else {
-                        onOpenListener?.let {
-                            it(folderFile)
-                        }
-                    }
-                } else if (type == SELECT) {
-                    folderFile.isSelected = !folderFile.isSelected
-
-                    binding.checked.isActivated = folderFile.isSelected
-                    onSelectListener?.let {
-                        it(folderFile)
-                    }
-                }
+            if (fileMove?.data == baseFile.data){
+                binding.bg.setBackgroundResource(R.color.blue_third)
+            }else{
+                binding.bg.setBackgroundResource(android.R.color.transparent)
             }
 
-            binding.root.setOnLongClickListener {
-                folderFile.isSelected = !folderFile.isSelected
+            binding.root.setOnClickListener {
+                if (File(baseFile.data!!).isDirectory) {
+                    if (fileMove?.data == baseFile.data) return@setOnClickListener
 
-                binding.checked.isActivated = folderFile.isSelected
-                onSelectListener?.let {
-                    it(folderFile)
+                    onClickListener?.let {
+                        it(baseFile)
+                    }
+                } else {
+                    onOpenListener?.let {
+                        it(baseFile)
+                    }
                 }
-                return@setOnLongClickListener true
             }
 
             binding.more.setOnClickListener {
-                onMoreListener?.let {
-                    it(binding.root, folderFile)
+                if (type == NORMAL){
+                    onMoreListener?.let {
+                        it(binding.root, baseFile)
+                    }
                 }
             }
 
@@ -142,68 +157,56 @@ class FolderFileAdapter(
 
     fun changeMode(type: Int) {
         this.type = type
-        if (type == NORMAL || type == MOVE) {
-            currentList.forEach {
-                it.isSelected = false
-            }
-        }
         notifyDataSetChanged()
     }
 
-
-    fun reloadItem(position: Int) {
-        notifyItemChanged(position)
-    }
-
-    fun getPosition(folderFile: FolderFile): Int {
-        if (currentList.isEmpty()) {
-            return -1
-        }
-        for (i in currentList.indices) {
-            val item = currentList[i]
-            if (item == folderFile) {
-                return i
+    fun setFileMove(baseFile: BaseFile) {
+        run breaking@{
+            currentList.forEachIndexed { index, file ->
+                if (file.data == baseFile.data) {
+                    fileMove = file
+                    notifyItemChanged(index)
+                    return@breaking
+                }
             }
         }
-        return -1
     }
+
+    fun removeFileMove() {
+        fileMove = null
+    }
+
+    fun getFileMove(): BaseFile = fileMove!!
 
     companion object {
         const val NORMAL = 0
-        const val SELECT = 1
-        const val MOVE = 2
+        const val MOVE = 1
 
-        private val diffUtil = object : DiffUtil.ItemCallback<FolderFile>() {
-            override fun areItemsTheSame(oldItem: FolderFile, newItem: FolderFile): Boolean =
+        private val diffUtil = object : DiffUtil.ItemCallback<BaseFile>() {
+            override fun areItemsTheSame(oldItem: BaseFile, newItem: BaseFile): Boolean =
                 oldItem.id == newItem.id
 
             @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: FolderFile, newItem: FolderFile): Boolean =
+            override fun areContentsTheSame(oldItem: BaseFile, newItem: BaseFile): Boolean =
                 oldItem == newItem
         }
     }
 
-    private var onClickListener: ((FolderFile) -> Unit)? = null
+    private var onClickListener: ((BaseFile) -> Unit)? = null
 
-    fun setOnClickListener(listener: (FolderFile) -> Unit) {
+    fun setOnClickListener(listener: (BaseFile) -> Unit) {
         onClickListener = listener
     }
 
-    private var onOpenListener: ((FolderFile) -> Unit)? = null
+    private var onOpenListener: ((BaseFile) -> Unit)? = null
 
-    fun setOnOpenListener(listener: (FolderFile) -> Unit) {
+    fun setOnOpenListener(listener: (BaseFile) -> Unit) {
         onOpenListener = listener
     }
 
-    private var onSelectListener: ((FolderFile) -> Unit)? = null
+    private var onMoreListener: ((View, BaseFile) -> Unit)? = null
 
-    fun setOnSelectListener(listener: (FolderFile) -> Unit) {
-        onSelectListener = listener
-    }
-
-    private var onMoreListener: ((View, FolderFile) -> Unit)? = null
-
-    fun setOnMoreItemListener(listener: (View, FolderFile) -> Unit) {
+    fun setOnMoreItemListener(listener: (View, BaseFile) -> Unit) {
         onMoreListener = listener
     }
 }
