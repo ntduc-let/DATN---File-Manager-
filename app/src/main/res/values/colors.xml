@@ -22,4 +22,5 @@
     <color name="doc_color">#0263D1</color>
     <color name="xls_color">#35C06F</color>
     <color name="txt_color">#7534FF</color>
+    <color name="filter_selected">#F4DEDF</color>
 </resources>

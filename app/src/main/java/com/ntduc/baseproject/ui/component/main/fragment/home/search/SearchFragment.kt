@@ -48,22 +48,94 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
         private const val FILTER_VIDEO = 2
         private const val FILTER_IMAGE = 3
         private const val FILTER_AUDIO = 4
+        private const val FILTER_APK = 5
 
+        private const val FILTER_DOCUMENT_ALL = 0
+        private const val FILTER_DOCUMENT_PDF = 1
+        private const val FILTER_DOCUMENT_TXT = 2
+        private const val FILTER_DOCUMENT_DOC = 3
+        private const val FILTER_DOCUMENT_XLS = 4
+        private const val FILTER_DOCUMENT_PPT = 5
     }
 
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var searchAdapter: SearchAdapter
 
+    private var typeFilter = FILTER_ALL
+    private var typeFilterDocument = FILTER_DOCUMENT_ALL
+
     override fun initView() {
         super.initView()
 
-        resetFilterAll()
+        setFilter(FILTER_ALL)
 
         searchAdapter = SearchAdapter(requireContext(), lifecycleScope)
         binding.rcv.apply {
             adapter = searchAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+    }
+
+    private fun setFilter(filter: Int) {
+        resetFilterAll()
+
+        typeFilter = filter
+
+        when (typeFilter) {
+            FILTER_ALL -> {
+                binding.all.text.setBackgroundResource(R.color.filter_selected)
+
+                viewModel.requestAllSearch(binding.search.query.trim().toString())
+            }
+
+            FILTER_DOCUMENT -> {
+                binding.document.text.setBackgroundResource(R.color.filter_selected)
+                binding.filterDocument.visible()
+
+                setFilterDocument(FILTER_DOCUMENT_ALL)
+            }
+
+            FILTER_VIDEO -> {
+                binding.video.text.setBackgroundResource(R.color.filter_selected)
+
+                viewModel.requestAllSearch(binding.search.query.trim().toString())
+            }
+
+            FILTER_IMAGE -> {
+                binding.image.text.setBackgroundResource(R.color.filter_selected)
+
+                viewModel.requestAllSearch(binding.search.query.trim().toString())
+            }
+
+            FILTER_AUDIO -> {
+                binding.audio.text.setBackgroundResource(R.color.filter_selected)
+
+                viewModel.requestAllSearch(binding.search.query.trim().toString())
+            }
+
+            FILTER_APK -> {
+                binding.apk.text.setBackgroundResource(R.color.filter_selected)
+
+                viewModel.requestAllSearch(binding.search.query.trim().toString())
+            }
+        }
+    }
+
+    private fun setFilterDocument(filterDocument: Int) {
+        resetFilterDocumentAll()
+
+        typeFilterDocument = filterDocument
+
+        when (typeFilterDocument) {
+            FILTER_DOCUMENT_ALL -> binding.documentAll.text.setBackgroundResource(R.color.filter_selected)
+            FILTER_DOCUMENT_PDF -> binding.documentPdf.text.setBackgroundResource(R.color.filter_selected)
+            FILTER_DOCUMENT_TXT -> binding.documentTxt.text.setBackgroundResource(R.color.filter_selected)
+            FILTER_DOCUMENT_DOC -> binding.documentDoc.text.setBackgroundResource(R.color.filter_selected)
+            FILTER_DOCUMENT_XLS -> binding.documentXls.text.setBackgroundResource(R.color.filter_selected)
+            FILTER_DOCUMENT_PPT -> binding.documentPpt.text.setBackgroundResource(R.color.filter_selected)
+        }
+
+        viewModel.requestAllSearch(binding.search.query.trim().toString())
     }
 
     override fun addEvent() {
@@ -82,7 +154,52 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
         }
 
         binding.all.root.setOnClickListener {
+            setFilter(FILTER_ALL)
+        }
 
+        binding.document.root.setOnClickListener {
+            setFilter(FILTER_DOCUMENT)
+
+        }
+
+        binding.video.root.setOnClickListener {
+            setFilter(FILTER_VIDEO)
+        }
+
+        binding.image.root.setOnClickListener {
+            setFilter(FILTER_IMAGE)
+        }
+
+        binding.audio.root.setOnClickListener {
+            setFilter(FILTER_AUDIO)
+        }
+
+        binding.apk.root.setOnClickListener {
+            setFilter(FILTER_APK)
+        }
+
+        binding.documentAll.root.setOnClickListener {
+            setFilterDocument(FILTER_DOCUMENT_ALL)
+        }
+
+        binding.documentPdf.root.setOnClickListener {
+            setFilterDocument(FILTER_DOCUMENT_PDF)
+        }
+
+        binding.documentTxt.root.setOnClickListener {
+            setFilterDocument(FILTER_DOCUMENT_TXT)
+        }
+
+        binding.documentDoc.root.setOnClickListener {
+            setFilterDocument(FILTER_DOCUMENT_DOC)
+        }
+
+        binding.documentXls.root.setOnClickListener {
+            setFilterDocument(FILTER_DOCUMENT_XLS)
+        }
+
+        binding.documentPpt.root.setOnClickListener {
+            setFilterDocument(FILTER_DOCUMENT_PPT)
         }
 
         searchAdapter.setOnOpenListener {
@@ -155,7 +272,32 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
             }
             is Resource.Success -> status.data?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    if (it.isEmpty()) {
+                    val temp = arrayListOf<BaseFile>()
+                    temp.addAll(it.filter {
+                        when (typeFilter) {
+                            FILTER_ALL -> true
+                            FILTER_VIDEO -> FileTypeExtension.getTypeFile(it.data!!) == FileTypeExtension.VIDEO
+                            FILTER_IMAGE -> FileTypeExtension.getTypeFile(it.data!!) == FileTypeExtension.IMAGE
+                            FILTER_AUDIO -> FileTypeExtension.getTypeFile(it.data!!) == FileTypeExtension.AUDIO
+                            FILTER_APK -> FileTypeExtension.getTypeFile(it.data!!) == FileTypeExtension.APK
+                            else -> {
+                                when (typeFilterDocument) {
+                                    FILTER_DOCUMENT_PDF -> FileTypeExtension.getTypeFile(it.data!!) == FileTypeExtension.PDF
+                                    FILTER_DOCUMENT_TXT -> FileTypeExtension.getTypeFile(it.data!!) == FileTypeExtension.TXT
+                                    FILTER_DOCUMENT_DOC -> FileTypeExtension.getTypeFile(it.data!!) == FileTypeExtension.DOC
+                                    FILTER_DOCUMENT_XLS -> FileTypeExtension.getTypeFile(it.data!!) == FileTypeExtension.XLS
+                                    FILTER_DOCUMENT_PPT -> FileTypeExtension.getTypeFile(it.data!!) == FileTypeExtension.PPT
+                                    else -> {
+                                        val type = FileTypeExtension.getTypeFile(it.data!!)
+                                        type == FileTypeExtension.PDF || type == FileTypeExtension.TXT || type == FileTypeExtension.DOC || type == FileTypeExtension.XLS || type == FileTypeExtension.PPT
+                                    }
+                                }
+                            }
+                        }
+                    })
+
+
+                    if (temp.isEmpty()) {
                         withContext(Dispatchers.Main) {
                             binding.rcv.gone()
                             binding.layoutNoItem.root.visible()
@@ -166,12 +308,12 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
                     }
 
                     val result = when (Hawk.get(SORT_BY, SORT_BY_NAME_A_Z)) {
-                        SORT_BY_NAME_A_Z -> it.sortedBy { item -> item.displayName?.uppercase() }
-                        SORT_BY_NAME_Z_A -> it.sortedBy { item -> item.displayName?.uppercase() }.reversed()
-                        SORT_BY_DATE_NEW -> it.sortedBy { item -> item.dateModified }.reversed()
-                        SORT_BY_DATE_OLD -> it.sortedBy { item -> item.dateModified }
-                        SORT_BY_SIZE_LARGE -> it.sortedBy { item -> item.size }.reversed()
-                        SORT_BY_SIZE_SMALL -> it.sortedBy { item -> item.size }
+                        SORT_BY_NAME_A_Z -> temp.sortedBy { item -> item.displayName?.uppercase() }
+                        SORT_BY_NAME_Z_A -> temp.sortedBy { item -> item.displayName?.uppercase() }.reversed()
+                        SORT_BY_DATE_NEW -> temp.sortedBy { item -> item.dateModified }.reversed()
+                        SORT_BY_DATE_OLD -> temp.sortedBy { item -> item.dateModified }
+                        SORT_BY_SIZE_LARGE -> temp.sortedBy { item -> item.size }.reversed()
+                        SORT_BY_SIZE_SMALL -> temp.sortedBy { item -> item.size }
                         else -> listOf()
                     }
 
